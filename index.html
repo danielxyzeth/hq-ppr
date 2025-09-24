@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PPR Motorsports HQ Pro — Client Preview</title>
+  <meta name="description" content="PPR Motorsports HQ Pro — a complete operating system for performance shops: funnels, CRM, scheduling, reviews, content, memberships, events, reporting." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0d0f;
+      --card: #121417;
+      --muted: #a6adbb;
+      --text: #e6e9ef;
+      --brand: #C1FF72; /* neon green */
+      --accent: #8FD3FF; /* operator blue accent */
+      --stroke: #1c2025;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    a { color: var(--brand); text-decoration: none; }
+    .container { width: min(1120px, 92vw); margin: 0 auto; }
+    header.nav { position: sticky; top: 0; backdrop-filter: saturate(180%) blur(8px); background: rgba(11,13,15,.7); border-bottom: 1px solid var(--stroke); z-index: 50; }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; }
+    .brand { display: flex; gap: 12px; align-items: center; font-weight: 800; letter-spacing: .2px; }
+    .brand-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 24px var(--brand); }
+    .nav-links a { margin-left: 18px; opacity: .9; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 18px; border-radius: 12px; border: 1px solid var(--stroke); background: linear-gradient(180deg,#15181c,#0e1013); color: var(--text); box-shadow: var(--shadow); }
+    .btn.primary { background: linear-gradient(180deg, #C1FF72, #85ff3b); color: #0b0d0f; border-color: #9fff45; font-weight: 800; }
+    .btn.ghost { background: transparent; }
+    .hero { position: relative; padding: 64px 0 48px; overflow: hidden; }
+    .glow { position: absolute; inset: -20% -20% auto auto; width: 520px; height: 520px; background: radial-gradient(60% 60% at 50% 50%, rgba(193,255,114,.18), transparent 60%); filter: blur(10px); pointer-events: none; }
+    .hero-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 28px; align-items: center; }
+    .hero h1 { font-size: clamp(28px, 4vw, 48px); line-height: 1.08; margin: 0 0 12px; }
+    .eyebrow { color: var(--brand); font-weight: 800; letter-spacing: .18em; text-transform: uppercase; font-size: 12px; }
+    .sub { color: var(--muted); font-size: 15px; }
+    .panel { background: linear-gradient(180deg,#13161a,#0f1216); border: 1px solid var(--stroke); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
+    .panel .meter { background: #0c0f12; border: 1px solid var(--stroke); height: 12px; border-radius: 999px; overflow: hidden; }
+    .panel .meter > span { display: block; height: 100%; background: linear-gradient(90deg,var(--brand),#9be86b,#69d14f); width: 72%; }
+    section { padding: 56px 0; }
+    h2.section-title { font-size: clamp(22px, 3vw, 34px); margin: 0 0 10px; }
+    p.lead { color: var(--muted); margin-top: 6px; }
+    .grid { display: grid; gap: 18px; }
+    .grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .card { background: var(--card); border: 1px solid var(--stroke); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
+    .card h3 { margin: 0 0 6px; font-size: 18px; }
+    .muted { color: var(--muted); font-size: 14px; }
+    .list { margin: 10px 0 0 0; padding: 0; list-style: none; }
+    .list li { margin: 8px 0; padding-left: 18px; position: relative; }
+    .list li:before { content: ""; width: 10px; height: 10px; border-radius: 2px; background: var(--brand); position: absolute; left: 0; top: 7px; box-shadow: 0 0 16px var(--brand); }
+    .pill { display: inline-flex; align-items: center; padding: 6px 10px; background: #0e1216; border: 1px solid var(--stroke); border-radius: 999px; gap: 8px; font-size: 12px; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; }
+    footer { border-top: 1px solid var(--stroke); padding: 24px 0 64px; color: var(--muted); font-size: 14px; }
+    @media (max-width: 960px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .grid.cols-3 { grid-template-columns: 1fr; }
+      .grid.cols-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav-inner">
+      <div class="brand"><span class="brand-dot"></span> PPR HQ Pro</div>
+      <nav class="nav-links">
+        <a href="#who">Who We Are</a>
+        <a href="#problem">Problem</a>
+        <a href="#solution">Solution</a>
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#cta" class="pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12h14M13 5l7 7-7 7" stroke="#C1FF72" stroke-width="2" stroke-linecap="round"/></svg> Get Started</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="glow"></div>
+    <div class="container hero-grid">
+      <div>
+        <div class="eyebrow">OperatorHQ AI</div>
+        <h1>PPR Motorsports HQ Pro<br><span style="color:var(--brand)">The complete operating system</span> for performance shops</h1>
+        <p class="sub">Ditch generic tools. Run funnels, CRM, scheduling, reviews, content, memberships, events and reporting — all in one Operator built for dynos, builds, and car culture.</p>
+        <div class="row" style="margin-top:16px;">
+          <a href="#pricing" class="btn primary">See Pricing</a>
+          <a href="#solution" class="btn ghost">How it works</a>
+        </div>
+      </div>
+      <div class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <strong>This Week’s Pipeline</strong>
+          <span class="pill"><span style="width:8px;height:8px;border-radius:50%;background:var(--brand);display:inline-block;"></span> Live</span>
+        </div>
+        <div class="row" style="margin-bottom:12px;">
+          <div class="card" style="flex:1;min-width:160px;">
+            <div class="muted">Booked Jobs</div>
+            <div style="font-size:28px;font-weight:800;">23</div>
+          </div>
+          <div class="card" style="flex:1;min-width:160px;">
+            <div class="muted">New Reviews</div>
+            <div style="font-size:28px;font-weight:800;">12</div>
+          </div>
+        </div>
+        <div class="muted" style="margin:6px 0 6px">Bay Utilization</div>
+        <div class="meter" aria-label="Bay Utilization"><span style="width:76%"></span></div>
+        <ul class="list" style="margin-top:12px">
+          <li>AI receptionist qualified 51 leads (BMW/Porsche bias)</li>
+          <li>Review engine on pace for +50/mo</li>
+          <li>Dyno Day RSVPs: 38 / 50 spots</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="who">
+    <div class="container">
+      <h2 class="section-title">Who we are</h2>
+      <p class="lead">AdSpend Agency engineers growth systems. OperatorHQ AI delivers <strong>HQs</strong> — vertical-specific Business Operating Systems. <strong>HQ Pro</strong> is the ultimate tier: an Operator that runs your shop end-to-end.</p>
+      <div class="grid cols-3" style="margin-top:18px;">
+        <div class="card"><h3>AdSpend Agency</h3><p class="muted">Performance advertising + revenue engineering.</p></div>
+        <div class="card"><h3>OperatorHQ AI</h3><p class="muted">AI-powered Operators (local + cloud) that automate operations.</p></div>
+        <div class="card"><h3>HQs</h3><p class="muted">Prebuilt operating systems for specific industries — Roofers, Auto, etc.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="problem">
+    <div class="container">
+      <h2 class="section-title">The problem</h2>
+      <div class="grid cols-3">
+        <div class="card"><h3>Missed revenue</h3><p class="muted">Missed calls, no-shows, slow follow-up, empty bays.</p></div>
+        <div class="card"><h3>Generic tools</h3><p class="muted">GHL & friends aren’t built for dynos, fitment, or tuning ops.</p></div>
+        <div class="card"><h3>Chaos</h3><p class="muted">Manual parts/status/content work. Customers kept in the dark.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="solution">
+    <div class="container">
+      <h2 class="section-title">The solution — HQ Pro</h2>
+      <p class="lead">A purpose-built Operator for performance shops: funnels → CRM → scheduler → reviews → content → memberships → events → reporting.</p>
+      <div class="grid cols-3" style="margin-top:18px;">
+        <div class="card">
+          <h3>Performance Funnels</h3>
+          <p class="muted">Stage 1/2/3, dyno RSVPs, turbo/exhaust packages with deposit-gated booking.</p>
+          <ul class="list"><li>HP goal quiz + VIN decode</li><li>Good/Better/Best quotes</li><li>Stripe deposits</li></ul>
+        </div>
+        <div class="card">
+          <h3>AI Receptionist</h3>
+          <p class="muted">Qualifies by car + HP goal across calls, SMS, webchat, IG/FB DMs.</p>
+          <ul class="list"><li>Unified inbox</li><li>Smart follow-ups</li><li>Lead routing</li></ul>
+        </div>
+        <div class="card">
+          <h3>Scheduler & Bays</h3>
+          <p class="muted">Bay/dyno load balancing, waitlist auto-fill, no-show deterrents.</p>
+          <ul class="list"><li>Confirm/reschedule links</li><li>Quick Lane mode</li><li>ETA-aware calendar</li></ul>
+        </div>
+        <div class="card">
+          <h3>Parts & Fitment</h3>
+          <p class="muted">PO automation, lead-time ETAs, core/returns, shelf/bin QR mapping.</p>
+          <ul class="list"><li>Fitment intelligence</li><li>CARB/EPA flags</li><li>Alternate suggestions</li></ul>
+        </div>
+        <div class="card">
+          <h3>RO / QA / Dyno Safety</h3>
+          <p class="muted">Digital ROs with torque/spec checklists and pre-run dyno gates.</p>
+          <ul class="list"><li>Road test & sign-off</li><li>Media consent</li><li>Compliance guard</li></ul>
+        </div>
+        <div class="card">
+          <h3>Tuner Brain</h3>
+          <p class="muted">ECU/TCU file vault (versioned), log viewer, remote tuner hub.</p>
+          <ul class="list"><li>Diffs & rollback</li><li>Anomaly highlights</li><li>Incident packets</li></ul>
+        </div>
+        <div class="card">
+          <h3>Content Engine</h3>
+          <p class="muted">Auto-edit reels from dyno runs, schedule to IG/TikTok/YouTube.</p>
+          <ul class="list"><li>HP overlay</li><li>Audio emphasis</li><li>Geo captions</li></ul>
+        </div>
+        <div class="card">
+          <h3>Reviews & Maps</h3>
+          <p class="muted">Event-triggered review asks + GBP posts to dominate local search.</p>
+          <ul class="list"><li>Negative intercept</li><li>Competitor watch</li><li>Velocity goals</li></ul>
+        </div>
+        <div class="card">
+          <h3>Memberships & Events</h3>
+          <p class="muted">PPR Club subscriptions + Dyno Day funnels with RSVP and payment.</p>
+          <ul class="list"><li>Seasonal reminders</li><li>Highlight reels</li><li>Referral engine</li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <h2 class="section-title">What this means for PPR</h2>
+      <div class="grid cols-2" style="margin-top:18px;">
+        <div class="card">
+          <h3>Outcomes</h3>
+          <ul class="list">
+            <li>Own your pipeline — no generic lead tools</li>
+            <li>Convert car culture into daily inbound</li>
+            <li>Dominate Chicago search with review velocity</li>
+            <li>Recurring revenue via memberships</li>
+            <li>Transparent CX: live job tracker & build sheets</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Weekly Snapshot (example)</h3>
+          <ul class="list">
+            <li>Calls 148 → Booked Jobs 27 (18%)</li>
+            <li>Average Job Margin: 42%</li>
+            <li>New Reviews: 15 (4.9★ avg)</li>
+            <li>Content Reach: 62,400 views</li>
+            <li>MRR (Memberships): $7,920</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing">
+    <div class="container">
+      <h2 class="section-title">Investment</h2>
+      <p class="lead">Activation refund if not live in 14 days.</p>
+      <div class="grid cols-3" style="margin-top:18px;">
+        <div class="card">
+          <h3>HQ Pro Setup</h3>
+          <p class="muted">One-time implementation</p>
+          <ul class="list">
+            <li>$15,000</li>
+            <li>All core modules</li>
+            <li>Team onboarding</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Managed</h3>
+          <p class="muted">Ongoing ops & growth</p>
+          <ul class="list">
+            <li>$4,000–$6,000 / month</li>
+            <li>Content, reviews, calendar fill</li>
+            <li>Analytics & improvements</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Performance Kicker</h3>
+          <p class="muted">Optional success fee</p>
+          <ul class="list">
+            <li>$250 / tracked job</li>
+            <li>or 2–3% of high-ticket builds</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cta">
+    <div class="container" style="text-align:center;">
+      <h2 class="section-title">Let’s launch PPR HQ Pro</h2>
+      <p class="lead">One closed job pays for the system.</p>
+      <div class="row" style="justify-content:center; margin-top:8px;">
+        <a href="#" class="btn primary">Book Strategy Session</a>
+        <a href="#" class="btn ghost">View Sample Build Sheet</a>
+      </div>
+      <p class="muted" style="margin-top:12px">© AdSpend Agency · OperatorHQ AI</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">This is a concept preview. Features shown are representative of the HQ Pro system tailored for performance shops like PPR Motorsports.</div>
+  </footer>
+
+  <script>
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', (e) => {
+        const id = a.getAttribute('href');
+        if(id && id !== '#') {
+          e.preventDefault();
+          document.querySelector(id).scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      })
+    })
+  </script>
+</body>
+</html>
