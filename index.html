@@ -3,100 +3,113 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PPR Motorsports — HQ Pro (Internal Operator UI)</title>
+  <title>PPR Motorsports — HQ Pro (Operator OS)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
-    /* === PPR Brand-ish Palette (tune if you have exact hex) === */
+    /* ===== PPR x Stripe aesthetic ===== */
     :root{
-      --bg:#0A0B0D;           /* deep charcoal */
-      --panel:#13151A;        /* card background */
-      --muted:#A9B0BE;        /* muted text */
-      --text:#F2F4F7;         /* primary text */
-      --accent:#E1352B;       /* PPR red */
-      --accent-2:#FFFFFF;     /* white */
-      --stroke:#1D2128;       /* borders */
-      --ok:#62D26F;           /* success */
-      --warn:#F5A524;         /* warning */
-      --bad:#FF5C5C;          /* danger */
-      --shadow:0 12px 34px rgba(0,0,0,.35);
-      --radius:14px;
+      --bg:#08090B;               /* deep graphite */
+      --bg-2:#0C0E12;             /* panels */
+      --card:#10141a;             /* cards */
+      --ink:#E8ECF1;              /* text */
+      --muted:#96A0AF;            /* secondary text */
+      --accent:#E02431;           /* PPR red (approx from site) */
+      --accent-2:#FF6B6B;         /* warm red for gradients */
+      --neon:#C1FF72;             /* operator neon for status */
+      --blue:#8FD3FF;             /* cool accent */
+      --stroke:#1B212A;           /* borders */
+      --glass:rgba(255,255,255,0.04);
+      --shadow:0 12px 40px rgba(0,0,0,.45);
+      --radius:16px;
     }
     *{box-sizing:border-box}
-    html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,sans-serif}
-    a{color:var(--accent);text-decoration:none}
-    .app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
-    .sidebar{border-right:1px solid var(--stroke);background:linear-gradient(180deg,#0C0E12,#0A0B0D)}
-    .sb-head{display:flex;align-items:center;gap:10px;padding:18px 18px;border-bottom:1px solid var(--stroke)}
-    .logo{width:18px;height:18px;border-radius:4px;background:var(--accent);box-shadow:0 0 20px var(--accent)}
+    html,body{margin:0;background:linear-gradient(180deg,var(--bg),#050607);color:var(--ink);font-family:Inter,system-ui,Segoe UI,Roboto,sans-serif}
+    a{color:var(--ink);text-decoration:none}
+    /* reset buttons/inputs */
+    button{appearance:none;-webkit-appearance:none;border:none;background:none;font:inherit;color:inherit;padding:0;cursor:pointer}
+    input,select{appearance:none;background:none;border:none;color:var(--ink)}
+
+    .app{display:grid;grid-template-columns:300px 1fr;min-height:100vh}
+    /* === Sidebar === */
+    .sidebar{background:linear-gradient(180deg,#0a0c11,#0a0b0d);border-right:1px solid var(--stroke)}
+    .sb-head{display:flex;align-items:center;gap:12px;padding:18px;border-bottom:1px solid var(--stroke)}
+    .logo{width:16px;height:16px;border-radius:4px;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 0 28px rgba(224,36,49,.5)}
     .brand{font-weight:800;letter-spacing:.2px}
-    .role{color:var(--muted);font-size:12px;margin-left:auto}
-    .sb-group{padding:14px 10px}
-    .sb-title{color:var(--muted);font-size:12px;font-weight:600;text-transform:uppercase;margin:8px 8px 6px}
-    .nav{list-style:none;padding:0;margin:0}
-    .nav li{margin:4px 0}
-    .nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:1px solid transparent;color:var(--text)}
-    .nav a.active{background:var(--panel);border-color:var(--stroke)}
-    .nav a:hover{background:#0E1116;border-color:var(--stroke)}
+    .role{margin-left:auto;color:var(--muted);font-size:12px}
+    .sb-title{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.12em;padding:12px 18px 6px}
+    .nav{list-style:none;margin:0;padding:0 10px 10px}
+    .nav a{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:12px;border:1px solid transparent;transition:.2s}
+    .nav a svg{opacity:.8}
+    .nav a:hover{background:var(--glass);border-color:var(--stroke)}
+    .nav a.active{background:linear-gradient(180deg,#131822,#101419);border-color:var(--stroke);box-shadow:inset 0 0 0 1px rgba(255,255,255,.02)}
 
+    /* === Topbar === */
     .main{display:flex;flex-direction:column}
-    .topbar{position:sticky;top:0;background:rgba(10,11,13,.8);backdrop-filter:saturate(160%) blur(8px);border-bottom:1px solid var(--stroke);z-index:10}
-    .tb-inner{display:flex;align-items:center;gap:12px;padding:12px 18px}
-    .pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid var(--stroke);background:#0E1116;color:var(--muted);font-size:12px}
-    .search{flex:1;display:flex;align-items:center;gap:8px;background:#0E1116;border:1px solid var(--stroke);border-radius:12px;padding:8px 10px}
-    input[type="search"]{flex:1;background:transparent;border:0;color:var(--text);outline:none}
-    .user{display:flex;align-items:center;gap:10px}
-    .avatar{width:28px;height:28px;border-radius:50%;background:#222;display:grid;place-items:center;border:1px solid var(--stroke)}
+    .topbar{position:sticky;top:0;z-index:50;background:rgba(10,12,16,.6);backdrop-filter:saturate(160%) blur(10px);border-bottom:1px solid var(--stroke)}
+    .tb{display:flex;gap:12px;align-items:center;padding:12px 18px}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:linear-gradient(180deg,#121722,#0F141B);border:1px solid var(--stroke);color:var(--muted);font-size:12px}
+    .search{flex:1;display:flex;align-items:center;gap:10px;background:linear-gradient(180deg,#0d1218,#0b0f14);border:1px solid var(--stroke);border-radius:14px;padding:10px 12px}
+    .search input{width:100%;outline:none}
+    .avatar{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#1c222b;border:1px solid var(--stroke)}
+    .select{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--stroke);padding:8px 10px;border-radius:12px;background:linear-gradient(180deg,#0d1218,#0b0f14)}
 
+    /* === Content === */
     .page{padding:18px}
     .grid{display:grid;gap:16px}
     .cols-4{grid-template-columns:repeat(4,1fr)}
     .cols-3{grid-template-columns:repeat(3,1fr)}
     .cols-2{grid-template-columns:repeat(2,1fr)}
-    @media (max-width:1200px){.cols-4{grid-template-columns:1fr 1fr}} 
-    @media (max-width:960px){.app{grid-template-columns:1fr}.sidebar{position:fixed;inset:56px auto 0 0;width:76%;max-width:320px;transform:translateX(-100%);transition:.25s}.sidebar.open{transform:none}.menu-btn{display:inline-flex} }
-    @media (min-width:961px){.menu-btn{display:none}}
+    @media(max-width:1200px){.cols-4{grid-template-columns:1fr 1fr}}
+    @media(max-width:980px){.app{grid-template-columns:1fr}.sidebar{position:fixed;inset:56px auto 0 0;width:82%;max-width:360px;transform:translateX(-100%);transition:.25s}.sidebar.open{transform:none}}
 
-    .card{background:linear-gradient(180deg,#13151A,#0F1116);border:1px solid var(--stroke);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
-    .card h3{margin:0 0 6px}
+    /* Card */
+    .card{background:radial-gradient(1200px 420px at -10% -10%, rgba(224,36,49,.08), transparent 40%), linear-gradient(180deg,#11161d,#0c1016);border:1px solid var(--stroke);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+    .card h3{margin:0 0 8px}
     .muted{color:var(--muted)}
+
+    /* KPI */
     .kpi{display:flex;align-items:center;justify-content:space-between}
     .kpi .val{font-size:28px;font-weight:800}
-    .bar{background:#0E1014;border:1px solid var(--stroke);height:10px;border-radius:999px;overflow:hidden}
-    .bar > span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#ff6a5a);width:60%}
+    .badge{padding:4px 10px;border-radius:999px;border:1px solid var(--stroke);background:linear-gradient(180deg,#131822,#0F141B);font-size:12px}
 
-    .tabs{display:flex;gap:8px;margin:4px 0 8px}
-    .tab{padding:8px 12px;border-radius:10px;border:1px solid var(--stroke);background:#0E1116;color:var(--muted);cursor:url('data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'16\' height=\'16\'><circle cx=\'8\' cy=\'8\' r=\'3\' fill=\'%23E1352B'/></svg>') 8 8, pointer}
-    .tab.active{background:var(--panel);color:var(--text)}
+    /* Buttons */
+    .btn{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;background:linear-gradient(180deg,#151b24,#0f141a);border:1px solid var(--stroke);box-shadow:0 2px 0 rgba(255,255,255,.03) inset, 0 8px 20px rgba(0,0,0,.35);transition:transform .06s ease, box-shadow .2s}
+    .btn:hover{box-shadow:0 2px 0 rgba(255,255,255,.05) inset, 0 14px 28px rgba(0,0,0,.45)}
+    .btn:active{transform:translateY(1px)}
+    .btn.primary{background:linear-gradient(180deg, var(--accent), var(--accent-2));border-color:#ff9a9a;color:#0a0b0d;font-weight:800}
+    .btn.ghost{background:transparent}
+    .btn.icon{padding:8px 10px}
 
+    /* Table */
     .table{width:100%;border-collapse:collapse;font-size:13px}
     .table th,.table td{padding:10px;border-bottom:1px solid var(--stroke);text-align:left}
-    .status{padding:4px 8px;border-radius:999px;font-size:12px;border:1px solid var(--stroke)}
-    .status.ok{background:rgba(98,210,111,.12);color:#98f0a1;border-color:rgba(98,210,111,.35)}
-    .status.warn{background:rgba(245,165,36,.12);color:#ffd18a;border-color:rgba(245,165,36,.35)}
-    .status.bad{background:rgba(255,92,92,.12);color:#ffb3b3;border-color:rgba(255,92,92,.35)}
+    .status{padding:5px 9px;border-radius:999px;border:1px solid var(--stroke);font-size:12px}
+    .ok{background:rgba(193,255,114,.08);color:#d7ff9f}
+    .warn{background:rgba(245,165,36,.1);color:#ffdca3}
+    .bad{background:rgba(224,36,49,.12);color:#ff9c9c}
 
-    .bay{display:flex;align-items:center;gap:10px;padding:10px;border:1px dashed var(--stroke);border-radius:12px}
-    .bay .dot{width:10px;height:10px;border-radius:50%}
-    .dot.free{background:var(--ok)}
+    /* Bay */
+    .bay{display:flex;align-items:center;gap:12px;padding:12px;border:1px dashed var(--stroke);border-radius:14px;background:linear-gradient(180deg,#0e131a,#0a0f15)}
+    .dot{width:10px;height:10px;border-radius:50%}
+    .dot.free{background:var(--neon)}
     .dot.busy{background:var(--accent)}
-    .dot.wait{background:var(--warn)}
+    .dot.wait{background:#F5A524}
 
-    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;border:1px solid var(--stroke);background:#0E1116;color:var(--text);cursor:pointer;user-select:none}
-    .btn.primary{background:linear-gradient(180deg,var(--accent),#c12e26);border-color:#f2756d;color:var(--accent-2);font-weight:800}
-    .btn.ghost{background:transparent}
+    /* Tabs */
+    .tabs{display:flex;gap:10px;margin:6px 0 10px}
+    .tab{padding:9px 12px;border-radius:12px;border:1px solid var(--stroke);background:linear-gradient(180deg,#121722,#0f141a);color:var(--muted)}
+    .tab.active{color:var(--ink);background:linear-gradient(180deg,#18202c,#121822)}
 
-    .split{display:grid;grid-template-columns: 1.2fr .8fr;gap:16px}
-    @media (max-width:1100px){.split{grid-template-columns:1fr}}
-
-    .notice{padding:10px;border:1px solid var(--stroke);border-radius:12px;background:#0E1116;color:var(--muted)}
-    .hint{font-size:12px;color:var(--muted);opacity:.9}
-    .tag{display:inline-block;padding:4px 8px;border:1px solid var(--stroke);border-radius:8px;font-size:12px;background:#0E1116;color:var(--muted)}
+    /* Toast */
+    .toast{position:fixed;right:18px;bottom:18px;background:linear-gradient(180deg,#121722,#0f141a);border:1px solid var(--stroke);padding:12px 14px;border-radius:12px;box-shadow:var(--shadow);opacity:0;transform:translateY(10px);transition:.2s}
+    .toast.show{opacity:1;transform:translateY(0)}
   </style>
 </head>
 <body>
   <div class="app">
+    <!-- ===== Sidebar ===== -->
     <aside class="sidebar" id="sidebar">
       <div class="sb-head">
         <div class="logo"></div>
@@ -104,242 +117,232 @@
         <div class="role" id="roleLabel">Role: Owner</div>
       </div>
 
-      <div class="sb-group">
-        <div class="sb-title">Overview</div>
-        <ul class="nav">
-          <li><a href="#" class="active" data-page="dashboard">Dashboard</a></li>
-          <li><a href="#" data-page="calendar">Calendar & Bays</a></li>
-          <li><a href="#" data-page="inbox">Unified Inbox</a></li>
-          <li><a href="#" data-page="leads">Leads & CRM</a></li>
-          <li><a href="#" data-page="quotes">Quotes & Deposits</a></li>
-        </ul>
-      </div>
+      <div class="sb-title">Overview</div>
+      <ul class="nav">
+        <li><a href="#" class="active" data-page="dashboard">🏁 Dashboard</a></li>
+        <li><a href="#" data-page="calendar">📅 Calendar & Bays</a></li>
+        <li><a href="#" data-page="inbox">💬 Unified Inbox</a></li>
+        <li><a href="#" data-page="leads">👤 Leads & CRM</a></li>
+        <li><a href="#" data-page="quotes">🧾 Quotes & Deposits</a></li>
+      </ul>
 
-      <div class="sb-group">
-        <div class="sb-title">Operations</div>
-        <ul class="nav">
-          <li><a href="#" data-page="workorders">Work Orders & QA</a></li>
-          <li><a href="#" data-page="parts">Parts & Fitment</a></li>
-          <li><a href="#" data-page="tuning">Tuner Brain</a></li>
-          <li><a href="#" data-page="memberships">Memberships</a></li>
-          <li><a href="#" data-page="events">Events (Dyno Day)</a></li>
-        </ul>
-      </div>
+      <div class="sb-title">Operations</div>
+      <ul class="nav">
+        <li><a href="#" data-page="workorders">🛠️ Work Orders & QA</a></li>
+        <li><a href="#" data-page="parts">📦 Parts & Fitment</a></li>
+        <li><a href="#" data-page="tuning">🧠 Tuner Brain</a></li>
+        <li><a href="#" data-page="memberships">🎟️ Memberships</a></li>
+        <li><a href="#" data-page="events">🏟️ Events (Dyno Day)</a></li>
+      </ul>
 
-      <div class="sb-group">
-        <div class="sb-title">Growth</div>
-        <ul class="nav">
-          <li><a href="#" data-page="content">Content Engine</a></li>
-          <li><a href="#" data-page="reviews">Reviews & GBP</a></li>
-          <li><a href="#" data-page="ads">Ads & Funnels</a></li>
-          <li><a href="#" data-page="reports">Reporting</a></li>
-        </ul>
-      </div>
+      <div class="sb-title">Growth</div>
+      <ul class="nav">
+        <li><a href="#" data-page="content">📹 Content Engine</a></li>
+        <li><a href="#" data-page="reviews">⭐ Reviews & GBP</a></li>
+        <li><a href="#" data-page="ads">📈 Ads & Funnels</a></li>
+        <li><a href="#" data-page="reports">📊 Reporting</a></li>
+      </ul>
 
-      <div class="sb-group">
-        <div class="sb-title">Admin</div>
-        <ul class="nav">
-          <li><a href="#" data-page="settings">Settings & Roles</a></li>
-          <li><a href="#" data-page="slas">SLAs & Compliance</a></li>
-          <li><a href="#" data-page="migration">Migration from GHL</a></li>
-        </ul>
-      </div>
+      <div class="sb-title">Admin</div>
+      <ul class="nav">
+        <li><a href="#" data-page="settings">⚙️ Settings & Roles</a></li>
+        <li><a href="#" data-page="slas">📜 SLAs & Compliance</a></li>
+        <li><a href="#" data-page="migration">⬇️ Migration from GHL</a></li>
+      </ul>
     </aside>
 
+    <!-- ===== Main ===== -->
     <main class="main">
       <div class="topbar">
-        <div class="tb-inner">
-          <button class="btn ghost menu-btn" onclick="toggleSidebar()">☰</button>
+        <div class="tb">
+          <button class="btn icon" onclick="toggleSidebar()">☰</button>
           <span class="pill">Environment: Pilot</span>
-          <div class="search"><span>🔎</span><input type="search" placeholder="Search leads, jobs, parts, posts..." oninput="searchAll(this.value)"/></div>
-          <div class="user"><div class="avatar">👤</div><select id="role" onchange="switchRole(this.value)"><option>Owner</option><option>Service Writer</option><option>Tech</option><option>Tuner</option><option>Front Desk</option></select></div>
+          <div class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#8aa2b2"/><path d="M20 20l-3.2-3.2" stroke="#8aa2b2"/></svg><input type="search" placeholder="Search leads, jobs, parts, posts..." oninput="searchAll(this.value)"/></div>
+          <div class="select"><span>Role</span><select id="role" onchange="switchRole(this.value)"><option>Owner</option><option>Service Writer</option><option>Tech</option><option>Tuner</option><option>Front Desk</option></select></div>
+          <div class="avatar">P</div>
         </div>
       </div>
 
-      <!-- DASHBOARD -->
+      <!-- ===== Dashboard ===== -->
       <section class="page" id="dashboard">
-        <div class="grid cols-4" id="kpiRow">
-          <div class="card kpi"><div><div class="muted">Booked Jobs (7d)</div><div class="val" id="kpiBooked">27</div></div><div class="status ok" id="kpiBookedDelta">+12%</div></div>
-          <div class="card kpi"><div><div class="muted">New Reviews</div><div class="val" id="kpiReviews">14</div></div><div class="status ok">4.9★</div></div>
-          <div class="card kpi"><div><div class="muted">Membership MRR</div><div class="val" id="kpiMRR">$7,920</div></div><div class="status warn">+3.1%</div></div>
-          <div class="card kpi"><div><div class="muted">Bay Utilization</div><div class="val" id="kpiUtil">76%</div></div></div>
+        <div class="grid cols-4">
+          <div class="card kpi"><div><div class="muted">Booked Jobs (7d)</div><div class="val" id="kpiBooked">27</div></div><span class="badge ok" id="kpiBookedDelta">+12%</span></div>
+          <div class="card kpi"><div><div class="muted">New Reviews</div><div class="val" id="kpiReviews">14</div></div><span class="badge ok">4.9★</span></div>
+          <div class="card kpi"><div><div class="muted">Membership MRR</div><div class="val" id="kpiMRR">$7,920</div></div><span class="badge">+3.1%</span></div>
+          <div class="card kpi"><div><div class="muted">Bay Utilization</div><div class="val" id="kpiUtil">76%</div></div><button class="btn" onclick="toast('Projected peak 2–4pm. Open Quick Lane?')">Forecast</button></div>
         </div>
-        <div class="split" style="margin-top:16px;">
+
+        <div class="grid cols-2" style="margin-top:16px;">
           <div class="card">
             <h3>Live Bays</h3>
-            <div class="grid cols-2" id="bayGrid">
-              <!-- bays rendered by JS -->
-            </div>
-            <div class="row" style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+            <div class="grid cols-2" id="bayGrid"></div>
+            <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
               <button class="btn" onclick="shuffleBays()">Shuffle Bays</button>
-              <button class="btn" onclick="openQuickLane()">Fill Quick Lane</button>
+              <button class="btn primary" onclick="openQuickLane()">Fill Quick Lane</button>
               <button class="btn" onclick="toggleDyno()">Toggle Dyno Queue</button>
             </div>
           </div>
           <div class="card">
             <h3>Today’s Schedule</h3>
-            <table class="table" id="scheduleTable">
-              <!-- schedule rows injected by JS -->
-            </table>
-            <div class="row" style="margin-top:8px">
+            <table class="table" id="scheduleTable"></table>
+            <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+              <button class="btn" onclick="sendReminder()">Send Reminder</button>
               <button class="btn primary" onclick="autofillConfirmations()">Auto-confirm Deposits</button>
-              <span class="hint">Simulate confirm/reschedule flows</span>
             </div>
           </div>
         </div>
+
         <div class="grid cols-3" style="margin-top:16px;">
-          <div class="card"><h3>Alerts</h3><ul class="list" id="alertList"></ul></div>
-          <div class="card"><h3>Content Queue</h3><ul class="list" id="contentList"></ul></div>
-          <div class="card"><h3>Quick Actions</h3><div class="grid cols-2"><button class="btn primary" onclick="newQuote()">New Quote</button><button class="btn" onclick="createWO()">Create Work Order</button><button class="btn" onclick="orderParts()">Order Parts</button><button class="btn" onclick="launchReviews()">Review Campaign</button></div></div>
+          <div class="card"><h3>Alerts</h3><ul id="alertList" class="muted" style="padding-left:18px"></ul></div>
+          <div class="card"><h3>Content Queue</h3><ul id="contentList" class="muted" style="padding-left:18px"></ul></div>
+          <div class="card"><h3>Quick Actions</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <button class="btn primary" onclick="newQuote()">New Quote</button>
+            <button class="btn" onclick="createWO()">Create Work Order</button>
+            <button class="btn" onclick="orderParts()">Order Parts</button>
+            <button class="btn" onclick="launchReviews()">Review Campaign</button>
+          </div></div>
         </div>
       </section>
 
-      <!-- CALENDAR & BAYS -->
+      <!-- ===== Calendar & Bays ===== -->
       <section class="page" id="calendar" hidden>
-        <div class="tabs"><span class="tab active" data-tab="day" onclick="switchCalTab('day', this)">Day</span><span class="tab" data-tab="week" onclick="switchCalTab('week', this)">Week</span><span class="tab" data-tab="bays" onclick="switchCalTab('bays', this)">Bays</span></div>
-        <div class="card"><div class="notice">ETA-aware calendar with deposit gating, auto-waitlist, and bay load balancing.</div></div>
-        <div class="grid cols-2" style="margin-top:12px;">
-          <div class="card"><h3>Bay Board</h3><div class="grid cols-2" id="bayBoard"></div></div>
-          <div class="card"><h3>Confirmations</h3><table class="table" id="confirmTable"></table><div class="row" style="margin-top:8px"><button class="btn" onclick="sendReminder()">Send Reminder</button><button class="btn primary" onclick="fillNoShow()">Fill No-Show with Waitlist</button></div></div>
-        </div>
-      </section>
-
-      <!-- INBOX -->
-      <section class="page" id="inbox" hidden>
-        <div class="card"><h3>Unified Inbox</h3><p class="muted">SMS · Calls · Webchat · IG/FB DMs consolidated with AI suggested replies.</p></div>
-        <div class="grid cols-2" style="margin-top:12px;">
-          <div class="card"><strong>Thread: @m3_comp</strong><p class="muted">“What gains for Stage 1?”</p><button class="btn primary" onclick="insertReply(this, 'Stage 1 on 93 typically adds +30–50hp. Want me to send a quote with options?')">Insert HP gains + quote</button></div>
-          <div class="card"><strong>Thread: Webchat</strong><p class="muted">“Do you finance turbo installs?”</p><button class="btn" onclick="insertReply(this, 'Yes—most customers do $0 down with $150–$250/mo. I can pre-qual you now.')">Send finance link</button></div>
-        </div>
-      </section>
-
-      <!-- LEADS -->
-      <section class="page" id="leads" hidden>
-        <div class="tabs"><span class="tab active" data-tab="pipeline">Pipeline</span><span class="tab" data-tab="segments">Segments</span></div>
+        <div class="tabs"><span class="tab active" onclick="switchCalTab('day', this)">Day</span><span class="tab" onclick="switchCalTab('week', this)">Week</span><span class="tab" onclick="switchCalTab('bays', this)">Bays</span></div>
         <div class="grid cols-2">
-          <div class="card">
-            <h3>Pipeline</h3>
-            <table class="table" id="leadTable"></table>
-            <div class="row" style="margin-top:8px"><button class="btn" onclick="advanceLead()">Advance Lead</button><button class="btn" onclick="dropLead()">Drop Lead</button></div>
-          </div>
-          <div class="card">
-            <h3>Segments</h3>
-            <ul class="list" id="segmentList"></ul>
-          </div>
+          <div class="card"><h3>Bay Board</h3><div class="grid cols-2" id="bayBoard"></div></div>
+          <div class="card"><h3>Confirmations</h3><table class="table" id="confirmTable"></table><div style="display:flex;gap:8px;margin-top:10px"><button class="btn" onclick="sendReminder()">Send Reminder</button><button class="btn primary" onclick="fillNoShow()">Fill No-Show w/ Waitlist</button></div></div>
         </div>
       </section>
 
-      <!-- QUOTES -->
+      <!-- ===== Inbox ===== -->
+      <section class="page" id="inbox" hidden>
+        <div class="card"><h3>Unified Inbox</h3><p class="muted">SMS · Calls · Webchat · IG/FB DMs with AI replies in-brand.</p></div>
+        <div class="grid cols-2" style="margin-top:12px;">
+          <div class="card"><strong>@m3_comp</strong><p class="muted">“What gains for Stage 1?”</p><button class="btn primary" onclick="insertReply(this,'Stage 1 (93) adds ~30–50hp. Want a quote with options?')">Insert HP gains + quote</button></div>
+          <div class="card"><strong>Webchat</strong><p class="muted">“Do you finance turbo installs?”</p><button class="btn" onclick="insertReply(this,'Yes—common is $0 down, ~$150–$250/mo. I can pre-qual you now.')">Send finance link</button></div>
+        </div>
+      </section>
+
+      <!-- ===== Leads ===== -->
+      <section class="page" id="leads" hidden>
+        <div class="grid cols-2">
+          <div class="card"><h3>Pipeline</h3><table class="table" id="leadTable"></table><div style="display:flex;gap:8px;margin-top:8px"><button class="btn" onclick="advanceLead()">Advance Lead</button><button class="btn" onclick="dropLead()">Drop Lead</button></div></div>
+          <div class="card"><h3>Segments</h3><ul id="segmentList" class="muted" style="padding-left:18px"></ul></div>
+        </div>
+      </section>
+
+      <!-- ===== Quotes ===== -->
       <section class="page" id="quotes" hidden>
         <div class="grid cols-2">
-          <div class="card"><h3>Quote Builder</h3><div class="notice">VIN decode + fitment checks + Good/Better/Best pricing with margin guardrails.</div><table class="table" id="quoteTable" style="margin-top:8px"></table><div class="row" style="margin-top:8px"><button class="btn" onclick="addQuoteItem()">Add Item</button><button class="btn primary" onclick="sendQuote()">Send with Deposit Link</button></div></div>
-          <div class="card"><h3>Deposits</h3><table class="table" id="depositTable"></table><div class="row" style="margin-top:8px"><button class="btn" onclick="markDepositPaid()">Mark Paid</button></div></div>
+          <div class="card"><h3>Quote Builder</h3><div class="muted">VIN decode + fitment check · Good/Better/Best with margin guardrails</div><table class="table" id="quoteTable" style="margin-top:8px"></table><div style="display:flex;gap:8px;margin-top:8px"><button class="btn" onclick="addQuoteItem()">Add Item</button><button class="btn primary" onclick="sendQuote()">Send with Deposit Link</button></div></div>
+          <div class="card"><h3>Deposits</h3><table class="table" id="depositTable"></table><div style="display:flex;gap:8px;margin-top:8px"><button class="btn" onclick="markDepositPaid()">Mark Paid</button></div></div>
         </div>
       </section>
 
-      <!-- WORK ORDERS -->
+      <!-- ===== Work Orders ===== -->
       <section class="page" id="workorders" hidden>
         <div class="grid cols-3">
-          <div class="card"><h3>Digital RO</h3><ul class="list" id="roList"></ul><button class="btn" onclick="toggleRO('Torque spec checklist')">Toggle Torque Step</button></div>
-          <div class="card"><h3>Dyno Safety</h3><ul class="list" id="dynoList"></ul><button class="btn" onclick="toggleDynoGate('Coolant temp OK')">Toggle Coolant Gate</button></div>
-          <div class="card"><h3>Road Test & Sign-off</h3><ul class="list" id="roadList"></ul><button class="btn" onclick="signCustomer()">Capture Signature</button></div>
+          <div class="card"><h3>Digital RO</h3><ul id="roList" class="muted" style="padding-left:18px"></ul><button class="btn" onclick="toggleRO('Torque spec checklist')">Toggle Torque Step</button></div>
+          <div class="card"><h3>Dyno Safety</h3><ul id="dynoList" class="muted" style="padding-left:18px"></ul><button class="btn" onclick="toggleDynoGate('Coolant temp OK')">Toggle Coolant Gate</button></div>
+          <div class="card"><h3>Road Test & Sign-off</h3><ul id="roadList" class="muted" style="padding-left:18px"></ul><button class="btn primary" onclick="signCustomer()">Capture Signature</button></div>
         </div>
       </section>
 
-      <!-- PARTS -->
+      <!-- ===== Parts ===== -->
       <section class="page" id="parts" hidden>
-        <div class="split">
-          <div class="card"><h3>POs & ETAs</h3><table class="table" id="poTable"></table><div class="row" style="margin-top:8px"><button class="btn" onclick="swapAlt()">Offer Alternate</button></div></div>
-          <div class="card"><h3>Fitment Watch</h3><ul class="list" id="fitmentList"></ul></div>
+        <div class="grid cols-2">
+          <div class="card"><h3>POs & ETAs</h3><table class="table" id="poTable"></table><div style="display:flex;gap:8px;margin-top:8px"><button class="btn" onclick="swapAlt()">Offer Alternate</button></div></div>
+          <div class="card"><h3>Fitment Watch</h3><ul id="fitmentList" class="muted" style="padding-left:18px"></ul></div>
         </div>
       </section>
 
-      <!-- TUNING -->
+      <!-- ===== Tuning ===== -->
       <section class="page" id="tuning" hidden>
         <div class="grid cols-2">
-          <div class="card"><h3>ECU/TCU Map Vault</h3><table class="table" id="mapTable"></table><div class="row" style="margin-top:8px"><button class="btn" onclick="bumpRev()">New Revision</button></div></div>
-          <div class="card"><h3>Log Viewer</h3><div class="notice">Overlay boost / AFR / knock. Anomalies highlighted. <span class="tag">Mock</span></div><div id="logChart" class="bar" style="margin-top:10px"><span style="width:42%"></span></div></div>
+          <div class="card"><h3>ECU/TCU Map Vault</h3><table class="table" id="mapTable"></table><div style="display:flex;gap:8px;margin-top:8px"><button class="btn" onclick="bumpRev()">New Revision</button></div></div>
+          <div class="card"><h3>Log Viewer</h3><div class="muted">Overlay boost / AFR / knock (mock)</div><div id="logChart" class="bar" style="margin-top:10px;height:12px;border-radius:999px;background:#0a0f14;border:1px solid var(--stroke)"><span style="display:block;height:100%;width:42%;background:linear-gradient(90deg,var(--blue),#b0e1ff)"></span></div></div>
         </div>
       </section>
 
-      <!-- MEMBERSHIPS -->
+      <!-- ===== Memberships ===== -->
       <section class="page" id="memberships" hidden>
         <div class="grid cols-2">
-          <div class="card"><h3>PPR Club</h3><ul class="list" id="clubList"></ul><div class="row" style="margin-top:8px"><button class="btn" onclick="createOffer()">Create Offer</button></div></div>
+          <div class="card"><h3>PPR Club</h3><ul id="clubList" class="muted" style="padding-left:18px"></ul><button class="btn" onclick="createOffer()">Create Offer</button></div>
           <div class="card"><h3>Billing</h3><table class="table" id="billTable"></table></div>
         </div>
       </section>
 
-      <!-- EVENTS -->
+      <!-- ===== Events ===== -->
       <section class="page" id="events" hidden>
         <div class="grid cols-2">
-          <div class="card"><h3>Dyno Day</h3><ul class="list" id="eventList"></ul><button class="btn primary" onclick="viewFunnel()">View Funnel</button></div>
-          <div class="card"><h3>Follow-up</h3><ul class="list" id="followList"></ul></div>
+          <div class="card"><h3>Dyno Day</h3><ul id="eventList" class="muted" style="padding-left:18px"></ul><button class="btn primary" onclick="viewFunnel()">View Funnel</button></div>
+          <div class="card"><h3>Follow-up</h3><ul id="followList" class="muted" style="padding-left:18px"></ul></div>
         </div>
       </section>
 
-      <!-- CONTENT -->
+      <!-- ===== Content ===== -->
       <section class="page" id="content" hidden>
         <div class="grid cols-3">
-          <div class="card"><h3>Auto-Editor Queue</h3><ul class="list" id="editorList"></ul></div>
-          <div class="card"><h3>Schedule</h3><ul class="list" id="schedList"></ul></div>
-          <div class="card"><h3>Captions</h3><ul class="list" id="capList"></ul></div>
+          <div class="card"><h3>Auto-Editor Queue</h3><ul id="editorList" class="muted" style="padding-left:18px"></ul></div>
+          <div class="card"><h3>Schedule</h3><ul id="schedList" class="muted" style="padding-left:18px"></ul></div>
+          <div class="card"><h3>Captions</h3><ul id="capList" class="muted" style="padding-left:18px"></ul></div>
         </div>
       </section>
 
-      <!-- REVIEWS -->
+      <!-- ===== Reviews ===== -->
       <section class="page" id="reviews" hidden>
         <div class="grid cols-2">
-          <div class="card"><h3>Review Velocity</h3><div class="bar" id="revBar" style="margin:8px 0 12px"><span style="width:68%"></span></div><p class="muted">Goal: 20 new reviews / month. Current: <span id="revCount">14</span>.</p><button class="btn" onclick="nudgeReviews()">Nudge Campaign</button></div>
-          <div class="card"><h3>Competitor Watch</h3><ul class="list" id="compList"></ul></div>
+          <div class="card"><h3>Review Velocity</h3><div class="bar" id="revBar" style="margin:10px 0;height:12px;border-radius:999px;background:#0a0f14;border:1px solid var(--stroke)"><span style="display:block;height:100%;width:68%;background:linear-gradient(90deg,var(--neon),#e8ffbb)"></span></div><div class="muted">Goal: 20 / mo. Current: <span id="revCount">14</span>.</div><button class="btn" onclick="nudgeReviews()">Nudge Campaign</button></div>
+          <div class="card"><h3>Competitor Watch</h3><ul id="compList" class="muted" style="padding-left:18px"></ul></div>
         </div>
       </section>
 
-      <!-- ADS -->
+      <!-- ===== Ads ===== -->
       <section class="page" id="ads" hidden>
         <div class="grid cols-2">
-          <div class="card"><h3>Funnels</h3><ul class="list" id="funnelList"></ul><button class="btn" onclick="genAds()">Generate Ads</button></div>
-          <div class="card"><h3>Budget & CPL</h3><ul class="list" id="budgetList"></ul></div>
+          <div class="card"><h3>Funnels</h3><ul id="funnelList" class="muted" style="padding-left:18px"></ul><button class="btn" onclick="genAds()">Generate Ads</button></div>
+          <div class="card"><h3>Budget & CPL</h3><ul id="budgetList" class="muted" style="padding-left:18px"></ul></div>
         </div>
       </section>
 
-      <!-- REPORTS -->
+      <!-- ===== Reports ===== -->
       <section class="page" id="reports" hidden>
         <div class="grid cols-3">
-          <div class="card"><h3>Weekly Snapshot</h3><ul class="list" id="snapList"></ul></div>
-          <div class="card"><h3>Anomalies</h3><ul class="list" id="anomList"></ul></div>
-          <div class="card"><h3>Recommendations</h3><ul class="list" id="recList"></ul></div>
+          <div class="card"><h3>Weekly Snapshot</h3><ul id="snapList" class="muted" style="padding-left:18px"></ul></div>
+          <div class="card"><h3>Anomalies</h3><ul id="anomList" class="muted" style="padding-left:18px"></ul></div>
+          <div class="card"><h3>Recommendations</h3><ul id="recList" class="muted" style="padding-left:18px"></ul></div>
         </div>
       </section>
 
-      <!-- SETTINGS -->
+      <!-- ===== Settings ===== -->
       <section class="page" id="settings" hidden>
         <div class="grid cols-2">
-          <div class="card"><h3>Roles & Permissions</h3><ul class="list"><li>Owner: full access</li><li>Service Writer: quotes, RO, calendar</li><li>Tech: RO tasks only</li><li>Tuner: maps & logs</li><li>Front Desk: inbox & schedule</li></ul></div>
-          <div class="card"><h3>Brand</h3><p class="muted">Update colors to exact PPR palette if different:</p><pre style="white-space:pre-wrap;background:#0E1116;border:1px solid var(--stroke);padding:12px;border-radius:10px">:root{ --accent: #E1352B; --bg:#0A0B0D; --panel:#13151A; }</pre></div>
+          <div class="card"><h3>Roles & Permissions</h3><ul class="muted" style="padding-left:18px"><li>Owner: full access</li><li>Service Writer: quotes, RO, calendar</li><li>Tech: RO tasks only</li><li>Tuner: maps & logs</li><li>Front Desk: inbox & schedule</li></ul></div>
+          <div class="card"><h3>Brand</h3><div class="muted">Current palette uses PPR red. Paste exact hex if different.</div><pre style="white-space:pre-wrap;background:#0d1218;border:1px solid var(--stroke);padding:12px;border-radius:12px">:root{ --accent:#E02431; --accent-2:#FF6B6B; }</pre></div>
         </div>
       </section>
 
-      <!-- SLAS -->
+      <!-- ===== SLAs ===== -->
       <section class="page" id="slas" hidden>
-        <div class="card"><h3>SLAs & Compliance</h3><ul class="list"><li>Lead response &lt; 5 minutes</li><li>TCPA consent logging ON</li><li>CARB/EPA disclaimers in quotes</li><li>Call recording notice visible</li></ul></div>
+        <div class="card"><h3>SLAs & Compliance</h3><ul class="muted" style="padding-left:18px"><li>Lead response &lt; 5 minutes</li><li>TCPA consent logging ON</li><li>CARB/EPA disclaimers in quotes</li><li>Call recording notice visible</li></ul></div>
       </section>
 
-      <!-- MIGRATION -->
+      <!-- ===== Migration ===== -->
       <section class="page" id="migration" hidden>
-        <div class="card"><h3>Migration from GHL</h3><ol class="list" style="list-style:decimal inside"><li>Export contacts, pipelines, tags</li><li>Port numbers (Twilio/CallRail)</li><li>Parallel-run 14 days</li><li>Cutover after acceptance checklist</li></ol></div>
+        <div class="card"><h3>Migration from GHL</h3><ol class="muted" style="padding-left:18px"><li>Export contacts, pipelines, tags</li><li>Port numbers (Twilio/CallRail)</li><li>Parallel-run 14 days</li><li>Cutover after acceptance checklist</li></ol></div>
       </section>
 
     </main>
   </div>
 
+  <div class="toast" id="toast">Saved.</div>
+
   <script>
-    // ===== Data (mock) =====
+    // ===== Mock data =====
     const state = {
       bays:[
         {name:'Bay 1', vehicle:'2018 BMW M3', job:'Stage 2 tune', eta:'2h', status:'busy'},
         {name:'Bay 2', vehicle:'2016 Audi S4', job:'Downpipes', eta:'3h', status:'busy'},
-        {name:'Dyno', vehicle:'Porsche 911', job:'Baseline', eta:'20m', status:'wait'},
+        {name:'Dyno',  vehicle:'Porsche 911', job:'Baseline',    eta:'20m',status:'wait'},
         {name:'Quick Lane', vehicle:'—', job:'Open slot (45m)', eta:'', status:'free'}
       ],
       schedule:[
@@ -363,7 +366,7 @@
       pos:[['PO-1128','ECS','RS7 IC','Fri','Backorder'],['PO-1130','FCP','Coilovers','Thu','Shipped']],
       fitment:['Audi S4 downpipe → ✅','BMW M3 midpipe → ✅','Porsche 911 tips → ⚠ require adapter'],
       maps:[['BMW M3','Stage 2','r4','+2° ign, 93oct'],['Audi RS3','Stage 1','r2','MAF scaled']],
-      club:['Active members: 132','Churn (30d): 2.1%','Next campaign: Spring Dyno Health Checks'],
+      club:['Active members: 132','Churn (30d): 2.1%','Next: Spring Dyno Health Checks'],
       billing:[['T. Allen','$99/mo','Paid'],['S. Rahman','$149/mo','Retrying']],
       event:['RSVPs: 38 / 50','Run order published','Highlight reel auto after event'],
       follow:['Thanks email scheduled','Review ask queued','Upsell: Stage 1 for baselines'],
@@ -378,144 +381,123 @@
       recs:['Shift 20% budget to BMW','Offer alt intercooler kit','Open Quick Lane at 4pm']
     };
 
-    // ===== Render Helpers =====
-    const $ = (sel) => document.querySelector(sel);
-    const $$ = (sel) => Array.from(document.querySelectorAll(sel));
-    const el = (tag, attrs={}, html='')=>{ const e=document.createElement(tag); Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v)); e.innerHTML=html; return e; };
+    // ===== DOM helpers =====
+    const $ = (s)=>document.querySelector(s);
+    const $$= (s)=>Array.from(document.querySelectorAll(s));
+    const el = (t,a={},h='')=>{const e=document.createElement(t);Object.entries(a).forEach(([k,v])=>e.setAttribute(k,v));e.innerHTML=h;return e};
 
+    // ===== Render =====
     function render(){
-      // Bays on dashboard
-      const bg = $('#bayGrid'); bg.innerHTML='';
-      state.bays.forEach(b=>{
-        const dot = `<span class="dot ${b.status}"></span>`;
-        bg.appendChild(el('div',{class:'bay'}, `${dot}<strong>${b.name}</strong> · ${b.vehicle} (${b.job}) · ETA ${b.eta||'—'}`));
-      });
-      // Schedule
-      const st = $('#scheduleTable'); st.innerHTML = '<thead><tr><th>Time</th><th>Customer</th><th>Vehicle</th><th>Service</th><th>Status</th></tr></thead>' +
-        '<tbody>'+state.schedule.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><span class="status ${r[5]||''}">${r[4]}</span></td></tr>`).join('')+'</tbody>';
-      // Alerts & Content
-      $('#alertList').innerHTML = state.alerts.map(a=>`<li>${a}</li>`).join('');
-      $('#contentList').innerHTML = state.content.map(a=>`<li>${a}</li>`).join('');
-      // Leads
-      $('#leadTable').innerHTML = '<thead><tr><th>Lead</th><th>Vehicle</th><th>Interest</th><th>Stage</th><th>Status</th></tr></thead>' +
-        '<tbody>'+state.leads.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><span class="status ${r[5]||''}">${r[4]}</span></td></tr>`).join('')+'</tbody>';
-      $('#segmentList').innerHTML = state.segments.map(s=>`<li>${s}</li>`).join('');
-      // Quotes
-      $('#quoteTable').innerHTML = '<thead><tr><th>Item</th><th>Qty</th><th>Cost</th><th>Price</th></tr></thead>' +
-        '<tbody>'+state.quote.map(q=>`<tr><td>${q[0]}</td><td>${q[1]}</td><td>${q[2]}</td><td>${q[3]}</td></tr>`).join('')+'</tbody>';
-      $('#depositTable').innerHTML = '<thead><tr><th>Customer</th><th>Amount</th><th>Status</th></tr></thead>' +
-        '<tbody>'+state.deposits.map(d=>`<tr><td>${d[0]}</td><td>${d[1]}</td><td><span class="status ${d[2]==='Paid'?'ok':'bad'}">${d[2]}</span></td></tr>`).join('')+'</tbody>';
+      // bays
+      const bg=$('#bayGrid'); bg.innerHTML=''; state.bays.forEach(b=>bg.appendChild(el('div',{class:'bay'},`<span class="dot ${b.status}"></span><strong>${b.name}</strong> · ${b.vehicle} — ${b.job} · ETA ${b.eta||'—'}`)));
+      const bb=$('#bayBoard'); if(bb){ bb.innerHTML=''; state.bays.forEach(b=>bb.appendChild(el('div',{class:'bay'},`<span class="dot ${b.status}"></span>${b.name} · ${b.vehicle} (${b.job})`))); }
+      // schedule
+      $('#scheduleTable').innerHTML='<thead><tr><th>Time</th><th>Customer</th><th>Vehicle</th><th>Service</th><th>Status</th></tr></thead><tbody>'+
+        state.schedule.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><span class="status ${r[5]||''}">${r[4]}</span></td></tr>`).join('')+'</tbody>';
+      // alert/content
+      $('#alertList').innerHTML = state.alerts.map(x=>`<li>${x}</li>`).join('');
+      $('#contentList').innerHTML = state.content.map(x=>`<li>${x}</li>`).join('');
+      // leads
+      const lt=$('#leadTable'); if(lt){ lt.innerHTML='<thead><tr><th>Lead</th><th>Vehicle</th><th>Interest</th><th>Stage</th><th>Status</th></tr></thead><tbody>'+state.leads.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><span class="status ${r[5]||''}">${r[4]}</span></td></tr>`).join('')+'</tbody>'; }
+      $('#segmentList') && ($('#segmentList').innerHTML=state.segments.map(s=>`<li>${s}</li>`).join(''));
+      // quotes
+      $('#quoteTable') && ($('#quoteTable').innerHTML='<thead><tr><th>Item</th><th>Qty</th><th>Cost</th><th>Price</th></tr></thead><tbody>'+state.quote.map(q=>`<tr><td>${q[0]}</td><td>${q[1]}</td><td>${q[2]}</td><td>${q[3]}</td></tr>`).join('')+'</tbody>');
+      $('#depositTable') && ($('#depositTable').innerHTML='<thead><tr><th>Customer</th><th>Amount</th><th>Status</th></tr></thead><tbody>'+state.deposits.map(d=>`<tr><td>${d[0]}</td><td>${d[1]}</td><td><span class="status ${d[2]==='Paid'?'ok':'bad'}">${d[2]}</span></td></tr>`).join('')+'</tbody>');
       // RO
-      $('#roList').innerHTML = state.ro.map(x=>`<li>${x}</li>`).join('');
-      $('#dynoList').innerHTML = state.dyno.map(x=>`<li>${x}</li>`).join('');
-      $('#roadList').innerHTML = state.road.map(x=>`<li>${x}</li>`).join('');
-      // Parts
-      $('#poTable').innerHTML = '<thead><tr><th>PO</th><th>Vendor</th><th>Item</th><th>ETA</th><th>Status</th></tr></thead>' +
-        '<tbody>'+state.pos.map(p=>`<tr><td>${p[0]}</td><td>${p[1]}</td><td>${p[2]}</td><td>${p[3]}</td><td><span class="status ${p[4]==='Shipped'?'ok':p[4]==='Backorder'?'warn':''}">${p[4]}</span></td></tr>`).join('')+'</tbody>';
-      $('#fitmentList').innerHTML = state.fitment.map(x=>`<li>${x}</li>`).join('');
-      // Tuning
-      $('#mapTable').innerHTML = '<thead><tr><th>Vehicle</th><th>Map</th><th>Rev</th><th>Notes</th></tr></thead>'+
-        '<tbody>'+state.maps.map(m=>`<tr><td>${m[0]}</td><td>${m[1]}</td><td>${m[2]}</td><td>${m[3]}</td></tr>`).join('')+'</tbody>';
-      // Memberships, Events, Content
-      $('#clubList').innerHTML = state.club.map(x=>`<li>${x}</li>`).join('');
-      $('#billTable').innerHTML = '<thead><tr><th>Member</th><th>Plan</th><th>Status</th></tr></thead>' +
-        '<tbody>'+state.billing.map(b=>`<tr><td>${b[0]}</td><td>${b[1]}</td><td><span class="status ${b[2]==='Paid'?'ok':'warn'}">${b[2]}</span></td></tr>`).join('')+'</tbody>';
-      $('#eventList').innerHTML = state.event.map(x=>`<li>${x}</li>`).join('');
-      $('#followList').innerHTML = state.follow.map(x=>`<li>${x}</li>`).join('');
-      $('#editorList').innerHTML = state.editor.map(x=>`<li>${x}</li>`).join('');
-      $('#schedList').innerHTML = state.sched.map(x=>`<li>${x}</li>`).join('');
-      $('#capList').innerHTML = state.caps.map(x=>`<li>${x}</li>`).join('');
-      // Reviews & Ads & Reports
-      $('#compList').innerHTML = state.comp.map(x=>`<li>${x}</li>`).join('');
-      $('#funnelList').innerHTML = state.funnels.map(x=>`<li>${x}</li>`).join('');
-      $('#budgetList').innerHTML = state.budget.map(x=>`<li>${x}</li>`).join('');
-      $('#snapList').innerHTML = state.snap.map(x=>`<li>${x}</li>`).join('');
-      $('#anomList').innerHTML = state.anom.map(x=>`<li>${x}</li>`).join('');
-      $('#recList').innerHTML = state.recs.map(x=>`<li>${x}</li>`).join('');
-      // Calendar bay board & confirmations
-      const bb = $('#bayBoard'); bb.innerHTML=''; state.bays.forEach(b=>bb.appendChild(el('div',{class:'bay'},`<span class="dot ${b.status}"></span>${b.name} · ${b.vehicle} (${b.job})`)));
-      const ct = $('#confirmTable'); ct.innerHTML = '<thead><tr><th>Appt</th><th>Customer</th><th>Deposit</th><th>Confirm</th></tr></thead>'+`<tbody><tr><td>2:00</td><td>K. Nguyen</td><td>Paid</td><td><span class="status ok">Yes</span></td></tr><tr><td>3:30</td><td>J. Rivera</td><td>Unpaid</td><td><span class="status bad">No</span></td></tr></tbody>`;
+      $('#roList') && ($('#roList').innerHTML = state.ro.map(x=>`<li>${x}</li>`).join(''));
+      $('#dynoList') && ($('#dynoList').innerHTML = state.dyno.map(x=>`<li>${x}</li>`).join(''));
+      $('#roadList') && ($('#roadList').innerHTML = state.road.map(x=>`<li>${x}</li>`).join(''));
+      // parts
+      $('#poTable') && ($('#poTable').innerHTML='<thead><tr><th>PO</th><th>Vendor</th><th>Item</th><th>ETA</th><th>Status</th></tr></thead><tbody>'+state.pos.map(p=>`<tr><td>${p[0]}</td><td>${p[1]}</td><td>${p[2]}</td><td>${p[3]}</td><td><span class="status ${p[4]==='Shipped'?'ok':p[4]==='Backorder'?'warn':''}">${p[4]}</span></td></tr>`).join('')+'</tbody>');
+      $('#fitmentList') && ($('#fitmentList').innerHTML=state.fitment.map(x=>`<li>${x}</li>`).join(''));
+      // tuning
+      $('#mapTable') && ($('#mapTable').innerHTML='<thead><tr><th>Vehicle</th><th>Map</th><th>Rev</th><th>Notes</th></tr></thead><tbody>'+state.maps.map(m=>`<tr><td>${m[0]}</td><td>${m[1]}</td><td>${m[2]}</td><td>${m[3]}</td></tr>`).join('')+'</tbody>');
+      // memberships/events/content/reviews/ads/reports
+      $('#clubList') && ($('#clubList').innerHTML=state.club.map(x=>`<li>${x}</li>`).join(''));
+      $('#billTable') && ($('#billTable').innerHTML='<thead><tr><th>Member</th><th>Plan</th><th>Status</th></tr></thead><tbody>'+state.billing.map(b=>`<tr><td>${b[0]}</td><td>${b[1]}</td><td><span class="status ${b[2]==='Paid'?'ok':'warn'}">${b[2]}</span></td></tr>`).join('')+'</tbody>');
+      $('#eventList') && ($('#eventList').innerHTML=state.event.map(x=>`<li>${x}</li>`).join(''));
+      $('#followList') && ($('#followList').innerHTML=state.follow.map(x=>`<li>${x}</li>`).join(''));
+      $('#editorList') && ($('#editorList').innerHTML=state.editor.map(x=>`<li>${x}</li>`).join(''));
+      $('#schedList') && ($('#schedList').innerHTML=state.sched.map(x=>`<li>${x}</li>`).join(''));
+      $('#capList') && ($('#capList').innerHTML=state.caps.map(x=>`<li>${x}</li>`).join(''));
+      $('#compList') && ($('#compList').innerHTML=state.comp.map(x=>`<li>${x}</li>`).join(''));
+      $('#funnelList') && ($('#funnelList').innerHTML=state.funnels.map(x=>`<li>${x}</li>`).join(''));
+      $('#budgetList') && ($('#budgetList').innerHTML=state.budget.map(x=>`<li>${x}</li>`).join(''));
+      $('#snapList') && ($('#snapList').innerHTML=state.snap.map(x=>`<li>${x}</li>`).join(''));
+      $('#anomList') && ($('#anomList').innerHTML=state.anom.map(x=>`<li>${x}</li>`).join(''));
+      $('#recList') && ($('#recList').innerHTML=state.recs.map(x=>`<li>${x}</li>`).join(''));
+      // confirms
+      const ct=$('#confirmTable'); if(ct){ ct.innerHTML='<thead><tr><th>Appt</th><th>Customer</th><th>Deposit</th><th>Confirm</th></tr></thead><tbody><tr><td>2:00</td><td>K. Nguyen</td><td>Paid</td><td><span class="status ok">Yes</span></td></tr><tr><td>3:30</td><td>J. Rivera</td><td>Unpaid</td><td><span class="status bad">No</span></td></tr></tbody>'; }
     }
 
-    // ===== Interactions =====
+    // ===== UI actions =====
     function toggleSidebar(){ $('#sidebar').classList.toggle('open'); }
-    const links = document.querySelectorAll('.nav a');
-    const pages = document.querySelectorAll('.page');
-    links.forEach(a=>a.addEventListener('click',e=>{e.preventDefault();links.forEach(l=>l.classList.remove('active'));a.classList.add('active');const id=a.dataset.page;pages.forEach(p=>p.hidden = p.id!==id);window.scrollTo({top:0,behavior:'smooth'});}));
+    const links = $$('.nav a');
+    const pages = $$('.page');
+    links.forEach(a=>a.addEventListener('click',e=>{e.preventDefault();links.forEach(l=>l.classList.remove('active'));a.classList.add('active');const id=a.dataset.page;pages.forEach(p=>p.hidden=p.id!==id);window.scrollTo({top:0,behavior:'smooth'});}));
 
-    const roleToHide = {
-      'Owner': [],
-      'Service Writer': ['ads','reports'],
-      'Tech': ['leads','quotes','ads','reviews','content','reports','memberships','events'],
-      'Tuner': ['leads','quotes','ads','reviews','content','memberships','events'],
-      'Front Desk': ['tuning','workorders','parts']
+    const roleToHide={
+      'Owner':[],
+      'Service Writer':['ads','reports'],
+      'Tech':['leads','quotes','ads','reviews','content','reports','memberships','events'],
+      'Tuner':['leads','quotes','ads','reviews','content','memberships','events'],
+      'Front Desk':['tuning','workorders','parts']
     };
-    function switchRole(role){
-      document.getElementById('roleLabel').textContent = 'Role: ' + role;
-      const hide = new Set(roleToHide[role]||[]);
-      links.forEach(a=>a.parentElement.style.display='');
-      links.forEach(a=>{ if(hide.has(a.dataset.page)) a.parentElement.style.display='none'; });
-      const current = document.querySelector('.nav a.active');
-      if (current && current.parentElement.style.display==='none'){
-        document.querySelector('.nav a[data-page="dashboard"]').click();
-      }
-    }
+    function switchRole(role){ $('#roleLabel').textContent='Role: '+role; const hide=new Set(roleToHide[role]||[]); links.forEach(a=>a.parentElement.style.display=''); links.forEach(a=>{if(hide.has(a.dataset.page)) a.parentElement.style.display='none';}); const cur=document.querySelector('.nav a.active'); if(cur && cur.parentElement.style.display==='none'){document.querySelector('.nav a[data-page="dashboard"]').click();}}
 
-    function searchAll(q){ if(!q){render();return;} // naive highlight
-      $$('table, ul.list').forEach(elm=>{ elm.querySelectorAll('mark').forEach(m=>m.replaceWith(m.firstChild));
-        elm.innerHTML = elm.innerHTML.replace(new RegExp(q,'gi'), m=>`<mark style="background:${getComputedStyle(document.documentElement).getPropertyValue('--accent')};color:#000;padding:0 2px;border-radius:2px">${m}</mark>`);
-      }); }
+    function searchAll(q){ if(!q){render();return;} $$('table, ul').forEach(blk=>{ blk.querySelectorAll('mark').forEach(m=>m.replaceWith(m.firstChild)); blk.innerHTML = blk.innerHTML.replace(new RegExp(q,'gi'), m=>`<mark style="background:var(--accent);color:#0b0d0f;border-radius:4px;padding:0 2px">${m}</mark>`); }); }
 
-    // Dashboard actions
-    function shuffleBays(){ state.bays.push(state.bays.shift()); render(); }
-    function openQuickLane(){ const ql=state.bays.find(b=>b.name==='Quick Lane'); if(ql){ ql.vehicle='Audi A4'; ql.job='Intake Install'; ql.status='busy'; ql.eta='45m'; } render(); }
-    function toggleDyno(){ const d=state.bays.find(b=>b.name==='Dyno'); d.status = d.status==='wait'?'busy':'wait'; render(); }
+    function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1600); }
 
-    function autofillConfirmations(){ state.deposits = state.deposits.map(d=>[d[0],d[1],'Paid']); render(); }
+    // dashboard
+    function shuffleBays(){ state.bays.push(state.bays.shift()); render(); toast('Re-ordered bays.'); }
+    function openQuickLane(){ const q=state.bays.find(b=>b.name==='Quick Lane'); q.vehicle='Audi A4'; q.job='Intake Install'; q.eta='45m'; q.status='busy'; render(); toast('Quick Lane filled.'); }
+    function toggleDyno(){ const d=state.bays.find(b=>b.name==='Dyno'); d.status=d.status==='wait'?'busy':'wait'; render(); }
+    function sendReminder(){ toast('Reminders sent.'); }
+    function autofillConfirmations(){ state.deposits = state.deposits.map(d=>[d[0],d[1],'Paid']); render(); toast('Deposits auto-confirmed.'); }
+
     function newQuote(){ document.querySelector('[data-page="quotes"]').click(); addQuoteItem(); }
     function createWO(){ document.querySelector('[data-page="workorders"]').click(); toggleRO('Torque spec checklist'); }
     function orderParts(){ document.querySelector('[data-page="parts"]').click(); swapAlt(); }
     function launchReviews(){ document.querySelector('[data-page="reviews"]').click(); nudgeReviews(); }
 
-    // Inbox actions
-    function insertReply(btn, msg){ const p = document.createElement('p'); p.textContent = 'AI → ' + msg; p.className='muted'; btn.parentElement.appendChild(p); }
+    // inbox
+    function insertReply(btn,msg){ const p=document.createElement('p'); p.textContent='AI → '+msg; p.className='muted'; btn.parentElement.appendChild(p); toast('Reply drafted.'); }
 
-    // Leads actions
-    function advanceLead(){ if(state.leads[1]){ state.leads[1][3] = 'Booked'; state.leads[1][4] = 'Deposit'; state.leads[1][5] = 'ok'; render(); } }
-    function dropLead(){ state.leads.pop(); render(); }
+    // leads
+    function advanceLead(){ if(state.leads[1]){state.leads[1][3]='Booked';state.leads[1][4]='Deposit';state.leads[1][5]='ok'; render(); toast('Lead advanced.');} }
+    function dropLead(){ state.leads.pop(); render(); toast('Lead dropped.'); }
 
-    // Quotes actions
+    // quotes
     function addQuoteItem(){ state.quote.push(['Shop supplies',1,'$0','$35']); render(); }
-    function sendQuote(){ alert('Quote sent with deposit link.'); }
-    function markDepositPaid(){ if(state.deposits[0]){ state.deposits[0][2] = 'Paid'; render(); } }
+    function sendQuote(){ toast('Quote sent with deposit link.'); }
+    function markDepositPaid(){ if(state.deposits[0]){ state.deposits[0][2]='Paid'; render(); toast('Deposit marked paid.'); } }
 
     // RO / Dyno
-    function toggleRO(step){ const i = state.ro.findIndex(s=>s.includes(step)); if(i>-1){ state.ro[i] = state.ro[i].includes('✅')? step+' ⏳' : step+' ✅'; render(); } }
-    function toggleDynoGate(step){ const i = state.dyno.findIndex(s=>s.includes(step)); if(i>-1){ const base = step; const ok = state.dyno[i].includes('✅'); state.dyno[i] = base + (ok?' ⏳':' ✅'); render(); } }
-    function signCustomer(){ const i = state.road.findIndex(s=>s.includes('Customer signature')); if(i>-1){ state.road[i] = 'Customer signature ✅'; render(); } }
+    function toggleRO(step){ const i=state.ro.findIndex(s=>s.includes(step)); if(i>-1){ state.ro[i] = state.ro[i].includes('✅')? step+' ⏳' : step+' ✅'; render(); } }
+    function toggleDynoGate(step){ const i=state.dyno.findIndex(s=>s.includes(step)); if(i>-1){ const ok=state.dyno[i].includes('✅'); state.dyno[i]= step + (ok?' ⏳':' ✅'); render(); } }
+    function signCustomer(){ const i=state.road.findIndex(s=>s.includes('Customer signature')); if(i>-1){ state.road[i]='Customer signature ✅'; render(); toast('Signature captured.'); } }
 
-    // Parts
-    function swapAlt(){ const i = state.pos.findIndex(p=>p[4]==='Backorder'); if(i>-1){ state.pos[i][2] += ' (alt kit)'; state.pos[i][4] = 'Shipped'; state.alerts = state.alerts.filter(a=>!a.includes('Backorder')); render(); } }
+    // parts
+    function swapAlt(){ const i=state.pos.findIndex(p=>p[4]==='Backorder'); if(i>-1){ state.pos[i][2]+=' (alt kit)'; state.pos[i][4]='Shipped'; state.alerts = state.alerts.filter(a=>!a.includes('Backorder')); render(); toast('Alternate offered & shipped.'); } }
 
-    // Tuning
-    function bumpRev(){ state.maps[0][2] = 'r5'; state.maps[0][3] = '+2° ign, 93oct, trims ok'; render(); }
+    // tuning
+    function bumpRev(){ state.maps[0][2]='r5'; state.maps[0][3]='+2° ign, 93oct, trims ok'; render(); toast('New map revision saved.'); }
 
-    // Memberships
-    function createOffer(){ alert('Created spring health-check offer for PPR Club.'); }
+    // memberships
+    function createOffer(){ toast('Spring health-check offer created.'); }
 
-    // Events
-    function viewFunnel(){ alert('Open Dyno Day funnel (mock).'); }
+    // events
+    function viewFunnel(){ toast('Opening Dyno Day funnel (mock).'); }
 
-    // Reviews
-    function nudgeReviews(){ const cur = parseInt(document.getElementById('revCount').textContent,10); document.getElementById('revCount').textContent = cur + 3; document.querySelector('#revBar span').style.width = '82%'; }
+    // reviews
+    function nudgeReviews(){ const c=$('#revCount'); c.textContent=parseInt(c.textContent,10)+3; $('#revBar span').style.width='82%'; toast('Review nudges sent.'); }
 
-    // Ads
-    function genAds(){ alert('Generated 3 ad briefs from recent jobs.'); }
+    // ads
+    function genAds(){ toast('Generated 3 ad briefs from recent jobs.'); }
 
-    // Calendar tabs
-    function switchCalTab(which, elTab){ $$('.tabs .tab').forEach(t=>t.classList.remove('active')); elTab.classList.add('active'); }
+    function switchCalTab(_,el){ $$('.tabs .tab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); }
 
-    // Init
     render();
   </script>
 </body>
