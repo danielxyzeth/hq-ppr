@@ -8,14 +8,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
-    /* --- Brand palette (update if exact hex codes differ) --- */
+    /* === PPR Brand-ish Palette (tune if you have exact hex) === */
     :root{
       --bg:#0A0B0D;           /* deep charcoal */
       --panel:#13151A;        /* card background */
       --muted:#A9B0BE;        /* muted text */
       --text:#F2F4F7;         /* primary text */
-      --accent:#E1352B;       /* PPR-red (adjust to exact brand if needed) */
-      --accent-2:#FFFFFF;     /* white for contrast */
+      --accent:#E1352B;       /* PPR red */
+      --accent-2:#FFFFFF;     /* white */
       --stroke:#1D2128;       /* borders */
       --ok:#62D26F;           /* success */
       --warn:#F5A524;         /* warning */
@@ -29,7 +29,7 @@
     .app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
     .sidebar{border-right:1px solid var(--stroke);background:linear-gradient(180deg,#0C0E12,#0A0B0D)}
     .sb-head{display:flex;align-items:center;gap:10px;padding:18px 18px;border-bottom:1px solid var(--stroke)}
-    .logo{width:12px;height:12px;border-radius:3px;background:var(--accent);box-shadow:0 0 20px var(--accent)}
+    .logo{width:18px;height:18px;border-radius:4px;background:var(--accent);box-shadow:0 0 20px var(--accent)}
     .brand{font-weight:800;letter-spacing:.2px}
     .role{color:var(--muted);font-size:12px;margin-left:auto}
     .sb-group{padding:14px 10px}
@@ -67,7 +67,7 @@
     .bar > span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#ff6a5a);width:60%}
 
     .tabs{display:flex;gap:8px;margin:4px 0 8px}
-    .tab{padding:8px 12px;border-radius:10px;border:1px solid var(--stroke);background:#0E1116;color:var(--muted);cursor:pointer}
+    .tab{padding:8px 12px;border-radius:10px;border:1px solid var(--stroke);background:#0E1116;color:var(--muted);cursor:url('data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'16\' height=\'16\'><circle cx=\'8\' cy=\'8\' r=\'3\' fill=\'%23E1352B'/></svg>') 8 8, pointer}
     .tab.active{background:var(--panel);color:var(--text)}
 
     .table{width:100%;border-collapse:collapse;font-size:13px}
@@ -83,7 +83,7 @@
     .dot.busy{background:var(--accent)}
     .dot.wait{background:var(--warn)}
 
-    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;border:1px solid var(--stroke);background:#0E1116;color:var(--text);cursor:pointer}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;border:1px solid var(--stroke);background:#0E1116;color:var(--text);cursor:pointer;user-select:none}
     .btn.primary{background:linear-gradient(180deg,var(--accent),#c12e26);border-color:#f2756d;color:var(--accent-2);font-weight:800}
     .btn.ghost{background:transparent}
 
@@ -91,6 +91,8 @@
     @media (max-width:1100px){.split{grid-template-columns:1fr}}
 
     .notice{padding:10px;border:1px solid var(--stroke);border-radius:12px;background:#0E1116;color:var(--muted)}
+    .hint{font-size:12px;color:var(--muted);opacity:.9}
+    .tag{display:inline-block;padding:4px 8px;border:1px solid var(--stroke);border-radius:8px;font-size:12px;background:#0E1116;color:var(--muted)}
   </style>
 </head>
 <body>
@@ -149,167 +151,181 @@
         <div class="tb-inner">
           <button class="btn ghost menu-btn" onclick="toggleSidebar()">☰</button>
           <span class="pill">Environment: Pilot</span>
-          <div class="search"><span>🔎</span><input type="search" placeholder="Search leads, jobs, parts, posts..."/></div>
+          <div class="search"><span>🔎</span><input type="search" placeholder="Search leads, jobs, parts, posts..." oninput="searchAll(this.value)"/></div>
           <div class="user"><div class="avatar">👤</div><select id="role" onchange="switchRole(this.value)"><option>Owner</option><option>Service Writer</option><option>Tech</option><option>Tuner</option><option>Front Desk</option></select></div>
         </div>
       </div>
 
-      <!-- PAGES -->
+      <!-- DASHBOARD -->
       <section class="page" id="dashboard">
-        <div class="grid cols-4">
-          <div class="card kpi"><div><div class="muted">Booked Jobs (7d)</div><div class="val">27</div></div><div class="status ok">+12%</div></div>
-          <div class="card kpi"><div><div class="muted">New Reviews</div><div class="val">14</div></div><div class="status ok">4.9★</div></div>
-          <div class="card kpi"><div><div class="muted">Membership MRR</div><div class="val">$7,920</div></div><div class="status warn">+3.1%</div></div>
-          <div class="card kpi"><div><div class="muted">Bay Utilization</div><div class="val">76%</div></div></div>
+        <div class="grid cols-4" id="kpiRow">
+          <div class="card kpi"><div><div class="muted">Booked Jobs (7d)</div><div class="val" id="kpiBooked">27</div></div><div class="status ok" id="kpiBookedDelta">+12%</div></div>
+          <div class="card kpi"><div><div class="muted">New Reviews</div><div class="val" id="kpiReviews">14</div></div><div class="status ok">4.9★</div></div>
+          <div class="card kpi"><div><div class="muted">Membership MRR</div><div class="val" id="kpiMRR">$7,920</div></div><div class="status warn">+3.1%</div></div>
+          <div class="card kpi"><div><div class="muted">Bay Utilization</div><div class="val" id="kpiUtil">76%</div></div></div>
         </div>
         <div class="split" style="margin-top:16px;">
           <div class="card">
             <h3>Live Bays</h3>
-            <div class="grid cols-2">
-              <div class="bay"><span class="dot busy"></span><strong>Bay 1</strong> · 2018 BMW M3 (Stage 2 tune) · ETA 2h</div>
-              <div class="bay"><span class="dot busy"></span><strong>Bay 2</strong> · 2016 Audi S4 (Downpipes) · ETA 3h</div>
-              <div class="bay"><span class="dot wait"></span><strong>Dyno</strong> · Porsche 911 (baseline) · in 20m</div>
-              <div class="bay"><span class="dot free"></span><strong>Quick Lane</strong> · Open slot (45m)</div>
+            <div class="grid cols-2" id="bayGrid">
+              <!-- bays rendered by JS -->
+            </div>
+            <div class="row" style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn" onclick="shuffleBays()">Shuffle Bays</button>
+              <button class="btn" onclick="openQuickLane()">Fill Quick Lane</button>
+              <button class="btn" onclick="toggleDyno()">Toggle Dyno Queue</button>
             </div>
           </div>
           <div class="card">
             <h3>Today’s Schedule</h3>
-            <table class="table">
-              <thead><tr><th>Time</th><th>Customer</th><th>Vehicle</th><th>Service</th><th>Status</th></tr></thead>
-              <tbody>
-                <tr><td>9:00</td><td>R. Patel</td><td>BMW M3</td><td>Stage 2</td><td><span class="status ok">Checked-in</span></td></tr>
-                <tr><td>11:30</td><td>M. Lopez</td><td>Audi S4</td><td>Downpipes</td><td><span class="status warn">Parts ETA 40m</span></td></tr>
-                <tr><td>2:00</td><td>K. Nguyen</td><td>Porsche 911</td><td>Dyno baseline</td><td><span class="status">Queued</span></td></tr>
-              </tbody>
+            <table class="table" id="scheduleTable">
+              <!-- schedule rows injected by JS -->
             </table>
+            <div class="row" style="margin-top:8px">
+              <button class="btn primary" onclick="autofillConfirmations()">Auto-confirm Deposits</button>
+              <span class="hint">Simulate confirm/reschedule flows</span>
+            </div>
           </div>
         </div>
         <div class="grid cols-3" style="margin-top:16px;">
-          <div class="card"><h3>Alerts</h3><ul class="list"><li>Backorder: RS7 intercooler (offer Wagner alt)</li><li>Review CSAT 3★ (call-back task created)</li><li>No-show risk: 2pm hasn’t confirmed deposit</li></ul></div>
-          <div class="card"><h3>Content Queue</h3><ul class="list"><li>Reel: M3 dyno 487→536hp (scheduled 5pm)</li><li>Post: Before/After exhaust clip (Fri)</li><li>GBP: "Why baseline before tune" (auto)</li></ul></div>
-          <div class="card"><h3>Quick Actions</h3><div class="grid cols-2"><button class="btn primary">New Quote</button><button class="btn">Create Work Order</button><button class="btn">Order Parts</button><button class="btn">Review Campaign</button></div></div>
+          <div class="card"><h3>Alerts</h3><ul class="list" id="alertList"></ul></div>
+          <div class="card"><h3>Content Queue</h3><ul class="list" id="contentList"></ul></div>
+          <div class="card"><h3>Quick Actions</h3><div class="grid cols-2"><button class="btn primary" onclick="newQuote()">New Quote</button><button class="btn" onclick="createWO()">Create Work Order</button><button class="btn" onclick="orderParts()">Order Parts</button><button class="btn" onclick="launchReviews()">Review Campaign</button></div></div>
         </div>
       </section>
 
+      <!-- CALENDAR & BAYS -->
       <section class="page" id="calendar" hidden>
-        <div class="tabs"><span class="tab active" data-tab="day">Day</span><span class="tab" data-tab="week">Week</span><span class="tab" data-tab="bays">Bays</span></div>
+        <div class="tabs"><span class="tab active" data-tab="day" onclick="switchCalTab('day', this)">Day</span><span class="tab" data-tab="week" onclick="switchCalTab('week', this)">Week</span><span class="tab" data-tab="bays" onclick="switchCalTab('bays', this)">Bays</span></div>
         <div class="card"><div class="notice">ETA-aware calendar with deposit gating, auto-waitlist, and bay load balancing.</div></div>
         <div class="grid cols-2" style="margin-top:12px;">
-          <div class="card"><h3>Bay Board</h3><div class="grid cols-2"><div class="bay"><span class="dot busy"></span>Bay 1 · Audi S4 (2h)</div><div class="bay"><span class="dot busy"></span>Bay 2 · BMW M3 (3h)</div><div class="bay"><span class="dot wait"></span>Dyno · Porsche 911 (baseline)</div><div class="bay"><span class="dot free"></span>Quick Lane · Open</div></div></div>
-          <div class="card"><h3>Confirmations</h3><table class="table"><thead><tr><th>Appt</th><th>Customer</th><th>Deposit</th><th>Confirm</th></tr></thead><tbody><tr><td>2:00</td><td>K. Nguyen</td><td>Paid</td><td><span class="status ok">Yes</span></td></tr><tr><td>3:30</td><td>J. Rivera</td><td>Unpaid</td><td><span class="status bad">No</span></td></tr></tbody></table></div>
+          <div class="card"><h3>Bay Board</h3><div class="grid cols-2" id="bayBoard"></div></div>
+          <div class="card"><h3>Confirmations</h3><table class="table" id="confirmTable"></table><div class="row" style="margin-top:8px"><button class="btn" onclick="sendReminder()">Send Reminder</button><button class="btn primary" onclick="fillNoShow()">Fill No-Show with Waitlist</button></div></div>
         </div>
       </section>
 
+      <!-- INBOX -->
       <section class="page" id="inbox" hidden>
         <div class="card"><h3>Unified Inbox</h3><p class="muted">SMS · Calls · Webchat · IG/FB DMs consolidated with AI suggested replies.</p></div>
         <div class="grid cols-2" style="margin-top:12px;">
-          <div class="card"><strong>Thread: @m3_comp</strong><p class="muted">"What gains for Stage 1?"</p><button class="btn primary">Insert HP gains + quote</button></div>
-          <div class="card"><strong>Thread: Webchat</strong><p class="muted">"Do you finance turbo installs?"</p><button class="btn">Send finance link</button></div>
+          <div class="card"><strong>Thread: @m3_comp</strong><p class="muted">“What gains for Stage 1?”</p><button class="btn primary" onclick="insertReply(this, 'Stage 1 on 93 typically adds +30–50hp. Want me to send a quote with options?')">Insert HP gains + quote</button></div>
+          <div class="card"><strong>Thread: Webchat</strong><p class="muted">“Do you finance turbo installs?”</p><button class="btn" onclick="insertReply(this, 'Yes—most customers do $0 down with $150–$250/mo. I can pre-qual you now.')">Send finance link</button></div>
         </div>
       </section>
 
+      <!-- LEADS -->
       <section class="page" id="leads" hidden>
         <div class="tabs"><span class="tab active" data-tab="pipeline">Pipeline</span><span class="tab" data-tab="segments">Segments</span></div>
         <div class="grid cols-2">
           <div class="card">
             <h3>Pipeline</h3>
-            <table class="table"><thead><tr><th>Lead</th><th>Vehicle</th><th>Interest</th><th>Stage</th><th>Status</th></tr></thead><tbody>
-              <tr><td>R. Patel</td><td>BMW M3</td><td>Stage 2</td><td>Booked</td><td><span class="status ok">Deposit</span></td></tr>
-              <tr><td>A. Gomez</td><td>Audi RS3</td><td>Downpipe</td><td>Quoted</td><td><span class="status warn">Follow-up</span></td></tr>
-              <tr><td>L. Chen</td><td>Porsche 911</td><td>Dyno</td><td>New</td><td><span class="status">Qualify</span></td></tr>
-            </tbody></table>
+            <table class="table" id="leadTable"></table>
+            <div class="row" style="margin-top:8px"><button class="btn" onclick="advanceLead()">Advance Lead</button><button class="btn" onclick="dropLead()">Drop Lead</button></div>
           </div>
           <div class="card">
             <h3>Segments</h3>
-            <ul class="list"><li>BMW M cars · 84 leads</li><li>Porsche 911 · 33 leads</li><li>Turbo installs (finance) · 19 leads</li></ul>
+            <ul class="list" id="segmentList"></ul>
           </div>
         </div>
       </section>
 
+      <!-- QUOTES -->
       <section class="page" id="quotes" hidden>
         <div class="grid cols-2">
-          <div class="card"><h3>Quote Builder</h3><div class="notice">VIN decode + fitment checks + Good/Better/Best pricing with margin guardrails.</div><table class="table" style="margin-top:8px"><thead><tr><th>Item</th><th>Qty</th><th>Cost</th><th>Price</th></tr></thead><tbody><tr><td>Downpipes</td><td>1</td><td>$780</td><td>$1,190</td></tr><tr><td>Labor (3h)</td><td>1</td><td>$0</td><td>$420</td></tr></tbody></table><button class="btn primary" style="margin-top:8px">Send with Deposit Link</button></div>
-          <div class="card"><h3>Deposits</h3><table class="table"><thead><tr><th>Customer</th><th>Amount</th><th>Status</th></tr></thead><tbody><tr><td>J. Rivera</td><td>$250</td><td><span class="status bad">Pending</span></td></tr><tr><td>K. Nguyen</td><td>$150</td><td><span class="status ok">Paid</span></td></tr></tbody></table></div>
+          <div class="card"><h3>Quote Builder</h3><div class="notice">VIN decode + fitment checks + Good/Better/Best pricing with margin guardrails.</div><table class="table" id="quoteTable" style="margin-top:8px"></table><div class="row" style="margin-top:8px"><button class="btn" onclick="addQuoteItem()">Add Item</button><button class="btn primary" onclick="sendQuote()">Send with Deposit Link</button></div></div>
+          <div class="card"><h3>Deposits</h3><table class="table" id="depositTable"></table><div class="row" style="margin-top:8px"><button class="btn" onclick="markDepositPaid()">Mark Paid</button></div></div>
         </div>
       </section>
 
+      <!-- WORK ORDERS -->
       <section class="page" id="workorders" hidden>
         <div class="grid cols-3">
-          <div class="card"><h3>Digital RO</h3><ul class="list"><li>Intake photos (8 angles) ✅</li><li>Torque spec checklist ⏳</li><li>Fluids check ✅</li><li>Media consent ✅</li></ul></div>
-          <div class="card"><h3>Dyno Safety</h3><ul class="list"><li>Strap points verified ✅</li><li>Coolant temp OK ✅</li><li>Fan config set ✅</li><li>Abort rule armed ✅</li></ul></div>
-          <div class="card"><h3>Road Test & Sign-off</h3><ul class="list"><li>Route logged ✅</li><li>Max RPM safe ✅</li><li>Customer signature ⏳</li></ul></div>
+          <div class="card"><h3>Digital RO</h3><ul class="list" id="roList"></ul><button class="btn" onclick="toggleRO('Torque spec checklist')">Toggle Torque Step</button></div>
+          <div class="card"><h3>Dyno Safety</h3><ul class="list" id="dynoList"></ul><button class="btn" onclick="toggleDynoGate('Coolant temp OK')">Toggle Coolant Gate</button></div>
+          <div class="card"><h3>Road Test & Sign-off</h3><ul class="list" id="roadList"></ul><button class="btn" onclick="signCustomer()">Capture Signature</button></div>
         </div>
       </section>
 
+      <!-- PARTS -->
       <section class="page" id="parts" hidden>
         <div class="split">
-          <div class="card"><h3>POs & ETAs</h3><table class="table"><thead><tr><th>PO</th><th>Vendor</th><th>Item</th><th>ETA</th><th>Status</th></tr></thead><tbody><tr><td>PO-1128</td><td>ECS</td><td>RS7 IC</td><td>Fri</td><td><span class="status warn">Backorder</span></td></tr><tr><td>PO-1130</td><td>FCP</td><td>Coilovers</td><td>Thu</td><td><span class="status ok">Shipped</span></td></tr></tbody></table></div>
-          <div class="card"><h3>Fitment Watch</h3><ul class="list"><li>Audi S4 downpipe → ✅</li><li>BMW M3 midpipe → ✅</li><li>Porsche 911 tips → ⚠ require adapter</li></ul></div>
+          <div class="card"><h3>POs & ETAs</h3><table class="table" id="poTable"></table><div class="row" style="margin-top:8px"><button class="btn" onclick="swapAlt()">Offer Alternate</button></div></div>
+          <div class="card"><h3>Fitment Watch</h3><ul class="list" id="fitmentList"></ul></div>
         </div>
       </section>
 
+      <!-- TUNING -->
       <section class="page" id="tuning" hidden>
         <div class="grid cols-2">
-          <div class="card"><h3>ECU/TCU Map Vault</h3><table class="table"><thead><tr><th>Vehicle</th><th>Map</th><th>Rev</th><th>Notes</th></tr></thead><tbody><tr><td>BMW M3</td><td>Stage 2</td><td>r4</td><td>+2° ign, 93oct</td></tr><tr><td>Audi RS3</td><td>Stage 1</td><td>r2</td><td>MAF scaled</td></tr></tbody></table></div>
-          <div class="card"><h3>Log Viewer</h3><div class="notice">Overlay boost / AFR / knock. Anomalies highlighted. Export to tuner.</div></div>
+          <div class="card"><h3>ECU/TCU Map Vault</h3><table class="table" id="mapTable"></table><div class="row" style="margin-top:8px"><button class="btn" onclick="bumpRev()">New Revision</button></div></div>
+          <div class="card"><h3>Log Viewer</h3><div class="notice">Overlay boost / AFR / knock. Anomalies highlighted. <span class="tag">Mock</span></div><div id="logChart" class="bar" style="margin-top:10px"><span style="width:42%"></span></div></div>
         </div>
       </section>
 
+      <!-- MEMBERSHIPS -->
       <section class="page" id="memberships" hidden>
         <div class="grid cols-2">
-          <div class="card"><h3>PPR Club</h3><ul class="list"><li>Active members: 132</li><li>Churn (30d): 2.1%</li><li>Next campaign: Spring Dyno Health Checks</li></ul><button class="btn">Create Offer</button></div>
-          <div class="card"><h3>Billing</h3><table class="table"><thead><tr><th>Member</th><th>Plan</th><th>Status</th></tr></thead><tbody><tr><td>T. Allen</td><td>$99/mo</td><td><span class="status ok">Paid</span></td></tr><tr><td>S. Rahman</td><td>$149/mo</td><td><span class="status warn">Retrying</span></td></tr></tbody></table></div>
+          <div class="card"><h3>PPR Club</h3><ul class="list" id="clubList"></ul><div class="row" style="margin-top:8px"><button class="btn" onclick="createOffer()">Create Offer</button></div></div>
+          <div class="card"><h3>Billing</h3><table class="table" id="billTable"></table></div>
         </div>
       </section>
 
+      <!-- EVENTS -->
       <section class="page" id="events" hidden>
         <div class="grid cols-2">
-          <div class="card"><h3>Dyno Day</h3><ul class="list"><li>RSVPs: 38 / 50</li><li>Run order published</li><li>Highlight reel auto after event</li></ul><button class="btn primary">View Funnel</button></div>
-          <div class="card"><h3>Follow-up</h3><ul class="list"><li>Thanks email scheduled</li><li>Review ask queued</li><li>Upsell: Stage 1 for baselines</li></ul></div>
+          <div class="card"><h3>Dyno Day</h3><ul class="list" id="eventList"></ul><button class="btn primary" onclick="viewFunnel()">View Funnel</button></div>
+          <div class="card"><h3>Follow-up</h3><ul class="list" id="followList"></ul></div>
         </div>
       </section>
 
+      <!-- CONTENT -->
       <section class="page" id="content" hidden>
         <div class="grid cols-3">
-          <div class="card"><h3>Auto-Editor Queue</h3><ul class="list"><li>M3 dyno pull (audio emphasis)</li><li>S4 exhaust before/after</li><li>911 baseline graph overlay</li></ul></div>
-          <div class="card"><h3>Schedule</h3><ul class="list"><li>IG Reels · Today 5:00p</li><li>TikTok · Thu 12:00p</li><li>YouTube Short · Sat 10:00a</li></ul></div>
-          <div class="card"><h3>Captions</h3><ul class="list"><li>“487→536hp on 93 #M3 #Chicago”</li><li>“S4 wakes up with downpipes”</li><li>“Why baseline first”</li></ul></div>
+          <div class="card"><h3>Auto-Editor Queue</h3><ul class="list" id="editorList"></ul></div>
+          <div class="card"><h3>Schedule</h3><ul class="list" id="schedList"></ul></div>
+          <div class="card"><h3>Captions</h3><ul class="list" id="capList"></ul></div>
         </div>
       </section>
 
+      <!-- REVIEWS -->
       <section class="page" id="reviews" hidden>
         <div class="grid cols-2">
-          <div class="card"><h3>Review Velocity</h3><div class="bar" style="margin:8px 0 12px"><span style="width:68%"></span></div><p class="muted">Goal: 20 new reviews / month. Current: 14.</p></div>
-          <div class="card"><h3>Competitor Watch</h3><ul class="list"><li>Shop A: +9/mo, 4.7★</li><li>Shop B: +5/mo, 4.8★</li><li>PPR: +14/mo, 4.9★</li></ul></div>
+          <div class="card"><h3>Review Velocity</h3><div class="bar" id="revBar" style="margin:8px 0 12px"><span style="width:68%"></span></div><p class="muted">Goal: 20 new reviews / month. Current: <span id="revCount">14</span>.</p><button class="btn" onclick="nudgeReviews()">Nudge Campaign</button></div>
+          <div class="card"><h3>Competitor Watch</h3><ul class="list" id="compList"></ul></div>
         </div>
       </section>
 
+      <!-- ADS -->
       <section class="page" id="ads" hidden>
         <div class="grid cols-2">
-          <div class="card"><h3>Funnels</h3><ul class="list"><li>Stage 1/2/3 — BMW</li><li>Dyno Baseline</li><li>Turbo Install (Finance)</li></ul><button class="btn">Generate Ads</button></div>
-          <div class="card"><h3>Budget & CPL</h3><ul class="list"><li>Spend (7d): $1,240</li><li>CPL: $82</li><li>Booked Rate: 19%</li></ul></div>
+          <div class="card"><h3>Funnels</h3><ul class="list" id="funnelList"></ul><button class="btn" onclick="genAds()">Generate Ads</button></div>
+          <div class="card"><h3>Budget & CPL</h3><ul class="list" id="budgetList"></ul></div>
         </div>
       </section>
 
+      <!-- REPORTS -->
       <section class="page" id="reports" hidden>
         <div class="grid cols-3">
-          <div class="card"><h3>Weekly Snapshot</h3><ul class="list"><li>Calls: 148</li><li>Leads: 62</li><li>Booked: 27</li><li>Jobs Margin: 42%</li></ul></div>
-          <div class="card"><h3>Anomalies</h3><ul class="list"><li>No-show spike Tue 3–5p</li><li>Tuner backlog 2 jobs</li><li>Backorder IC impacts 3 quotes</li></ul></div>
-          <div class="card"><h3>Recommendations</h3><ul class="list"><li>Shift 20% budget to BMW</li><li>Offer alt intercooler kit</li><li>Open Quick Lane at 4pm</li></ul></div>
+          <div class="card"><h3>Weekly Snapshot</h3><ul class="list" id="snapList"></ul></div>
+          <div class="card"><h3>Anomalies</h3><ul class="list" id="anomList"></ul></div>
+          <div class="card"><h3>Recommendations</h3><ul class="list" id="recList"></ul></div>
         </div>
       </section>
 
+      <!-- SETTINGS -->
       <section class="page" id="settings" hidden>
         <div class="grid cols-2">
           <div class="card"><h3>Roles & Permissions</h3><ul class="list"><li>Owner: full access</li><li>Service Writer: quotes, RO, calendar</li><li>Tech: RO tasks only</li><li>Tuner: maps & logs</li><li>Front Desk: inbox & schedule</li></ul></div>
-          <div class="card"><h3>Brand</h3><p class="muted">Update colors to exact PPR palette if different:</p><pre style="white-space:pre-wrap;background:#0E1116;border:1px solid var(--stroke);padding:12px;border-radius:10px">:root{ --accent: #E1352B; /* PPR red? */ --bg:#0A0B0D; --panel:#13151A; }</pre></div>
+          <div class="card"><h3>Brand</h3><p class="muted">Update colors to exact PPR palette if different:</p><pre style="white-space:pre-wrap;background:#0E1116;border:1px solid var(--stroke);padding:12px;border-radius:10px">:root{ --accent: #E1352B; --bg:#0A0B0D; --panel:#13151A; }</pre></div>
         </div>
       </section>
 
+      <!-- SLAS -->
       <section class="page" id="slas" hidden>
         <div class="card"><h3>SLAs & Compliance</h3><ul class="list"><li>Lead response &lt; 5 minutes</li><li>TCPA consent logging ON</li><li>CARB/EPA disclaimers in quotes</li><li>Call recording notice visible</li></ul></div>
       </section>
 
+      <!-- MIGRATION -->
       <section class="page" id="migration" hidden>
         <div class="card"><h3>Migration from GHL</h3><ol class="list" style="list-style:decimal inside"><li>Export contacts, pipelines, tags</li><li>Port numbers (Twilio/CallRail)</li><li>Parallel-run 14 days</li><li>Cutover after acceptance checklist</li></ol></div>
       </section>
@@ -318,18 +334,115 @@
   </div>
 
   <script>
-    // Sidebar toggle (mobile)
-    function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
+    // ===== Data (mock) =====
+    const state = {
+      bays:[
+        {name:'Bay 1', vehicle:'2018 BMW M3', job:'Stage 2 tune', eta:'2h', status:'busy'},
+        {name:'Bay 2', vehicle:'2016 Audi S4', job:'Downpipes', eta:'3h', status:'busy'},
+        {name:'Dyno', vehicle:'Porsche 911', job:'Baseline', eta:'20m', status:'wait'},
+        {name:'Quick Lane', vehicle:'—', job:'Open slot (45m)', eta:'', status:'free'}
+      ],
+      schedule:[
+        ['9:00','R. Patel','BMW M3','Stage 2','Checked-in','ok'],
+        ['11:30','M. Lopez','Audi S4','Downpipes','Parts ETA 40m','warn'],
+        ['2:00','K. Nguyen','Porsche 911','Dyno baseline','Queued','']
+      ],
+      alerts:['Backorder: RS7 intercooler (offer Wagner alt)','Review CSAT 3★ (call-back task created)','No-show risk: 2pm hasn\'t confirmed deposit'],
+      content:['Reel: M3 dyno 487→536hp (scheduled 5pm)','Post: Before/After exhaust clip (Fri)','GBP: "Why baseline before tune" (auto)'],
+      leads:[
+        ['R. Patel','BMW M3','Stage 2','Booked','Deposit','ok'],
+        ['A. Gomez','Audi RS3','Downpipe','Quoted','Follow-up','warn'],
+        ['L. Chen','Porsche 911','Dyno','New','Qualify','']
+      ],
+      segments:['BMW M cars · 84 leads','Porsche 911 · 33 leads','Turbo installs (finance) · 19 leads'],
+      quote:[['Downpipes',1,'$780','$1,190'],['Labor (3h)',1,'$0','$420']],
+      deposits:[['J. Rivera','$250','Pending'],['K. Nguyen','$150','Paid']],
+      ro:['Intake photos (8 angles) ✅','Torque spec checklist ⏳','Fluids check ✅','Media consent ✅'],
+      dyno:['Strap points verified ✅','Coolant temp OK ✅','Fan config set ✅','Abort rule armed ✅'],
+      road:['Route logged ✅','Max RPM safe ✅','Customer signature ⏳'],
+      pos:[['PO-1128','ECS','RS7 IC','Fri','Backorder'],['PO-1130','FCP','Coilovers','Thu','Shipped']],
+      fitment:['Audi S4 downpipe → ✅','BMW M3 midpipe → ✅','Porsche 911 tips → ⚠ require adapter'],
+      maps:[['BMW M3','Stage 2','r4','+2° ign, 93oct'],['Audi RS3','Stage 1','r2','MAF scaled']],
+      club:['Active members: 132','Churn (30d): 2.1%','Next campaign: Spring Dyno Health Checks'],
+      billing:[['T. Allen','$99/mo','Paid'],['S. Rahman','$149/mo','Retrying']],
+      event:['RSVPs: 38 / 50','Run order published','Highlight reel auto after event'],
+      follow:['Thanks email scheduled','Review ask queued','Upsell: Stage 1 for baselines'],
+      editor:['M3 dyno pull (audio emphasis)','S4 exhaust before/after','911 baseline graph overlay'],
+      sched:['IG Reels · Today 5:00p','TikTok · Thu 12:00p','YouTube Short · Sat 10:00a'],
+      caps:['“487→536hp on 93 #M3 #Chicago”','“S4 wakes up with downpipes”','“Why baseline first”'],
+      comp:['Shop A: +9/mo, 4.7★','Shop B: +5/mo, 4.8★','PPR: +14/mo, 4.9★'],
+      funnels:['Stage 1/2/3 — BMW','Dyno Baseline','Turbo Install (Finance)'],
+      budget:['Spend (7d): $1,240','CPL: $82','Booked Rate: 19%'],
+      snap:['Calls: 148','Leads: 62','Booked: 27','Jobs Margin: 42%'],
+      anom:['No-show spike Tue 3–5p','Tuner backlog 2 jobs','Backorder IC impacts 3 quotes'],
+      recs:['Shift 20% budget to BMW','Offer alt intercooler kit','Open Quick Lane at 4pm']
+    };
 
-    // Simple SPA routing
+    // ===== Render Helpers =====
+    const $ = (sel) => document.querySelector(sel);
+    const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+    const el = (tag, attrs={}, html='')=>{ const e=document.createElement(tag); Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v)); e.innerHTML=html; return e; };
+
+    function render(){
+      // Bays on dashboard
+      const bg = $('#bayGrid'); bg.innerHTML='';
+      state.bays.forEach(b=>{
+        const dot = `<span class="dot ${b.status}"></span>`;
+        bg.appendChild(el('div',{class:'bay'}, `${dot}<strong>${b.name}</strong> · ${b.vehicle} (${b.job}) · ETA ${b.eta||'—'}`));
+      });
+      // Schedule
+      const st = $('#scheduleTable'); st.innerHTML = '<thead><tr><th>Time</th><th>Customer</th><th>Vehicle</th><th>Service</th><th>Status</th></tr></thead>' +
+        '<tbody>'+state.schedule.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><span class="status ${r[5]||''}">${r[4]}</span></td></tr>`).join('')+'</tbody>';
+      // Alerts & Content
+      $('#alertList').innerHTML = state.alerts.map(a=>`<li>${a}</li>`).join('');
+      $('#contentList').innerHTML = state.content.map(a=>`<li>${a}</li>`).join('');
+      // Leads
+      $('#leadTable').innerHTML = '<thead><tr><th>Lead</th><th>Vehicle</th><th>Interest</th><th>Stage</th><th>Status</th></tr></thead>' +
+        '<tbody>'+state.leads.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><span class="status ${r[5]||''}">${r[4]}</span></td></tr>`).join('')+'</tbody>';
+      $('#segmentList').innerHTML = state.segments.map(s=>`<li>${s}</li>`).join('');
+      // Quotes
+      $('#quoteTable').innerHTML = '<thead><tr><th>Item</th><th>Qty</th><th>Cost</th><th>Price</th></tr></thead>' +
+        '<tbody>'+state.quote.map(q=>`<tr><td>${q[0]}</td><td>${q[1]}</td><td>${q[2]}</td><td>${q[3]}</td></tr>`).join('')+'</tbody>';
+      $('#depositTable').innerHTML = '<thead><tr><th>Customer</th><th>Amount</th><th>Status</th></tr></thead>' +
+        '<tbody>'+state.deposits.map(d=>`<tr><td>${d[0]}</td><td>${d[1]}</td><td><span class="status ${d[2]==='Paid'?'ok':'bad'}">${d[2]}</span></td></tr>`).join('')+'</tbody>';
+      // RO
+      $('#roList').innerHTML = state.ro.map(x=>`<li>${x}</li>`).join('');
+      $('#dynoList').innerHTML = state.dyno.map(x=>`<li>${x}</li>`).join('');
+      $('#roadList').innerHTML = state.road.map(x=>`<li>${x}</li>`).join('');
+      // Parts
+      $('#poTable').innerHTML = '<thead><tr><th>PO</th><th>Vendor</th><th>Item</th><th>ETA</th><th>Status</th></tr></thead>' +
+        '<tbody>'+state.pos.map(p=>`<tr><td>${p[0]}</td><td>${p[1]}</td><td>${p[2]}</td><td>${p[3]}</td><td><span class="status ${p[4]==='Shipped'?'ok':p[4]==='Backorder'?'warn':''}">${p[4]}</span></td></tr>`).join('')+'</tbody>';
+      $('#fitmentList').innerHTML = state.fitment.map(x=>`<li>${x}</li>`).join('');
+      // Tuning
+      $('#mapTable').innerHTML = '<thead><tr><th>Vehicle</th><th>Map</th><th>Rev</th><th>Notes</th></tr></thead>'+
+        '<tbody>'+state.maps.map(m=>`<tr><td>${m[0]}</td><td>${m[1]}</td><td>${m[2]}</td><td>${m[3]}</td></tr>`).join('')+'</tbody>';
+      // Memberships, Events, Content
+      $('#clubList').innerHTML = state.club.map(x=>`<li>${x}</li>`).join('');
+      $('#billTable').innerHTML = '<thead><tr><th>Member</th><th>Plan</th><th>Status</th></tr></thead>' +
+        '<tbody>'+state.billing.map(b=>`<tr><td>${b[0]}</td><td>${b[1]}</td><td><span class="status ${b[2]==='Paid'?'ok':'warn'}">${b[2]}</span></td></tr>`).join('')+'</tbody>';
+      $('#eventList').innerHTML = state.event.map(x=>`<li>${x}</li>`).join('');
+      $('#followList').innerHTML = state.follow.map(x=>`<li>${x}</li>`).join('');
+      $('#editorList').innerHTML = state.editor.map(x=>`<li>${x}</li>`).join('');
+      $('#schedList').innerHTML = state.sched.map(x=>`<li>${x}</li>`).join('');
+      $('#capList').innerHTML = state.caps.map(x=>`<li>${x}</li>`).join('');
+      // Reviews & Ads & Reports
+      $('#compList').innerHTML = state.comp.map(x=>`<li>${x}</li>`).join('');
+      $('#funnelList').innerHTML = state.funnels.map(x=>`<li>${x}</li>`).join('');
+      $('#budgetList').innerHTML = state.budget.map(x=>`<li>${x}</li>`).join('');
+      $('#snapList').innerHTML = state.snap.map(x=>`<li>${x}</li>`).join('');
+      $('#anomList').innerHTML = state.anom.map(x=>`<li>${x}</li>`).join('');
+      $('#recList').innerHTML = state.recs.map(x=>`<li>${x}</li>`).join('');
+      // Calendar bay board & confirmations
+      const bb = $('#bayBoard'); bb.innerHTML=''; state.bays.forEach(b=>bb.appendChild(el('div',{class:'bay'},`<span class="dot ${b.status}"></span>${b.name} · ${b.vehicle} (${b.job})`)));
+      const ct = $('#confirmTable'); ct.innerHTML = '<thead><tr><th>Appt</th><th>Customer</th><th>Deposit</th><th>Confirm</th></tr></thead>'+`<tbody><tr><td>2:00</td><td>K. Nguyen</td><td>Paid</td><td><span class="status ok">Yes</span></td></tr><tr><td>3:30</td><td>J. Rivera</td><td>Unpaid</td><td><span class="status bad">No</span></td></tr></tbody>`;
+    }
+
+    // ===== Interactions =====
+    function toggleSidebar(){ $('#sidebar').classList.toggle('open'); }
     const links = document.querySelectorAll('.nav a');
     const pages = document.querySelectorAll('.page');
     links.forEach(a=>a.addEventListener('click',e=>{e.preventDefault();links.forEach(l=>l.classList.remove('active'));a.classList.add('active');const id=a.dataset.page;pages.forEach(p=>p.hidden = p.id!==id);window.scrollTo({top:0,behavior:'smooth'});}));
 
-    // Tabs (per page)
-    document.querySelectorAll('.tabs .tab').forEach(t=>t.addEventListener('click',()=>{const group=t.parentElement.querySelectorAll('.tab');group.forEach(x=>x.classList.remove('active'));t.classList.add('active');}));
-
-    // Role switching (filters visible nav/pages subtly)
     const roleToHide = {
       'Owner': [],
       'Service Writer': ['ads','reports'],
@@ -340,16 +453,70 @@
     function switchRole(role){
       document.getElementById('roleLabel').textContent = 'Role: ' + role;
       const hide = new Set(roleToHide[role]||[]);
-      // show all
       links.forEach(a=>a.parentElement.style.display='');
-      // hide certain navs
       links.forEach(a=>{ if(hide.has(a.dataset.page)) a.parentElement.style.display='none'; });
-      // ensure current page is visible
       const current = document.querySelector('.nav a.active');
       if (current && current.parentElement.style.display==='none'){
         document.querySelector('.nav a[data-page="dashboard"]').click();
       }
     }
+
+    function searchAll(q){ if(!q){render();return;} // naive highlight
+      $$('table, ul.list').forEach(elm=>{ elm.querySelectorAll('mark').forEach(m=>m.replaceWith(m.firstChild));
+        elm.innerHTML = elm.innerHTML.replace(new RegExp(q,'gi'), m=>`<mark style="background:${getComputedStyle(document.documentElement).getPropertyValue('--accent')};color:#000;padding:0 2px;border-radius:2px">${m}</mark>`);
+      }); }
+
+    // Dashboard actions
+    function shuffleBays(){ state.bays.push(state.bays.shift()); render(); }
+    function openQuickLane(){ const ql=state.bays.find(b=>b.name==='Quick Lane'); if(ql){ ql.vehicle='Audi A4'; ql.job='Intake Install'; ql.status='busy'; ql.eta='45m'; } render(); }
+    function toggleDyno(){ const d=state.bays.find(b=>b.name==='Dyno'); d.status = d.status==='wait'?'busy':'wait'; render(); }
+
+    function autofillConfirmations(){ state.deposits = state.deposits.map(d=>[d[0],d[1],'Paid']); render(); }
+    function newQuote(){ document.querySelector('[data-page="quotes"]').click(); addQuoteItem(); }
+    function createWO(){ document.querySelector('[data-page="workorders"]').click(); toggleRO('Torque spec checklist'); }
+    function orderParts(){ document.querySelector('[data-page="parts"]').click(); swapAlt(); }
+    function launchReviews(){ document.querySelector('[data-page="reviews"]').click(); nudgeReviews(); }
+
+    // Inbox actions
+    function insertReply(btn, msg){ const p = document.createElement('p'); p.textContent = 'AI → ' + msg; p.className='muted'; btn.parentElement.appendChild(p); }
+
+    // Leads actions
+    function advanceLead(){ if(state.leads[1]){ state.leads[1][3] = 'Booked'; state.leads[1][4] = 'Deposit'; state.leads[1][5] = 'ok'; render(); } }
+    function dropLead(){ state.leads.pop(); render(); }
+
+    // Quotes actions
+    function addQuoteItem(){ state.quote.push(['Shop supplies',1,'$0','$35']); render(); }
+    function sendQuote(){ alert('Quote sent with deposit link.'); }
+    function markDepositPaid(){ if(state.deposits[0]){ state.deposits[0][2] = 'Paid'; render(); } }
+
+    // RO / Dyno
+    function toggleRO(step){ const i = state.ro.findIndex(s=>s.includes(step)); if(i>-1){ state.ro[i] = state.ro[i].includes('✅')? step+' ⏳' : step+' ✅'; render(); } }
+    function toggleDynoGate(step){ const i = state.dyno.findIndex(s=>s.includes(step)); if(i>-1){ const base = step; const ok = state.dyno[i].includes('✅'); state.dyno[i] = base + (ok?' ⏳':' ✅'); render(); } }
+    function signCustomer(){ const i = state.road.findIndex(s=>s.includes('Customer signature')); if(i>-1){ state.road[i] = 'Customer signature ✅'; render(); } }
+
+    // Parts
+    function swapAlt(){ const i = state.pos.findIndex(p=>p[4]==='Backorder'); if(i>-1){ state.pos[i][2] += ' (alt kit)'; state.pos[i][4] = 'Shipped'; state.alerts = state.alerts.filter(a=>!a.includes('Backorder')); render(); } }
+
+    // Tuning
+    function bumpRev(){ state.maps[0][2] = 'r5'; state.maps[0][3] = '+2° ign, 93oct, trims ok'; render(); }
+
+    // Memberships
+    function createOffer(){ alert('Created spring health-check offer for PPR Club.'); }
+
+    // Events
+    function viewFunnel(){ alert('Open Dyno Day funnel (mock).'); }
+
+    // Reviews
+    function nudgeReviews(){ const cur = parseInt(document.getElementById('revCount').textContent,10); document.getElementById('revCount').textContent = cur + 3; document.querySelector('#revBar span').style.width = '82%'; }
+
+    // Ads
+    function genAds(){ alert('Generated 3 ad briefs from recent jobs.'); }
+
+    // Calendar tabs
+    function switchCalTab(which, elTab){ $$('.tabs .tab').forEach(t=>t.classList.remove('active')); elTab.classList.add('active'); }
+
+    // Init
+    render();
   </script>
 </body>
 </html>
