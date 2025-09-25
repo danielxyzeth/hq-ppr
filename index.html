@@ -1,288 +1,355 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PPR Motorsports HQ Pro — Client Preview</title>
-  <meta name="description" content="PPR Motorsports HQ Pro — a complete operating system for performance shops: funnels, CRM, scheduling, reviews, content, memberships, events, reporting." />
+  <title>PPR Motorsports — HQ Pro (Internal Operator UI)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #0b0d0f;
-      --card: #121417;
-      --muted: #a6adbb;
-      --text: #e6e9ef;
-      --brand: #C1FF72; /* neon green */
-      --accent: #8FD3FF; /* operator blue accent */
-      --stroke: #1c2025;
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
-      --radius: 16px;
+    /* --- Brand palette (update if exact hex codes differ) --- */
+    :root{
+      --bg:#0A0B0D;           /* deep charcoal */
+      --panel:#13151A;        /* card background */
+      --muted:#A9B0BE;        /* muted text */
+      --text:#F2F4F7;         /* primary text */
+      --accent:#E1352B;       /* PPR-red (adjust to exact brand if needed) */
+      --accent-2:#FFFFFF;     /* white for contrast */
+      --stroke:#1D2128;       /* borders */
+      --ok:#62D26F;           /* success */
+      --warn:#F5A524;         /* warning */
+      --bad:#FF5C5C;          /* danger */
+      --shadow:0 12px 34px rgba(0,0,0,.35);
+      --radius:14px;
     }
-    * { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
-    a { color: var(--brand); text-decoration: none; }
-    .container { width: min(1120px, 92vw); margin: 0 auto; }
-    header.nav { position: sticky; top: 0; backdrop-filter: saturate(180%) blur(8px); background: rgba(11,13,15,.7); border-bottom: 1px solid var(--stroke); z-index: 50; }
-    .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; }
-    .brand { display: flex; gap: 12px; align-items: center; font-weight: 800; letter-spacing: .2px; }
-    .brand-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 24px var(--brand); }
-    .nav-links a { margin-left: 18px; opacity: .9; }
-    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 18px; border-radius: 12px; border: 1px solid var(--stroke); background: linear-gradient(180deg,#15181c,#0e1013); color: var(--text); box-shadow: var(--shadow); }
-    .btn.primary { background: linear-gradient(180deg, #C1FF72, #85ff3b); color: #0b0d0f; border-color: #9fff45; font-weight: 800; }
-    .btn.ghost { background: transparent; }
-    .hero { position: relative; padding: 64px 0 48px; overflow: hidden; }
-    .glow { position: absolute; inset: -20% -20% auto auto; width: 520px; height: 520px; background: radial-gradient(60% 60% at 50% 50%, rgba(193,255,114,.18), transparent 60%); filter: blur(10px); pointer-events: none; }
-    .hero-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 28px; align-items: center; }
-    .hero h1 { font-size: clamp(28px, 4vw, 48px); line-height: 1.08; margin: 0 0 12px; }
-    .eyebrow { color: var(--brand); font-weight: 800; letter-spacing: .18em; text-transform: uppercase; font-size: 12px; }
-    .sub { color: var(--muted); font-size: 15px; }
-    .panel { background: linear-gradient(180deg,#13161a,#0f1216); border: 1px solid var(--stroke); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
-    .panel .meter { background: #0c0f12; border: 1px solid var(--stroke); height: 12px; border-radius: 999px; overflow: hidden; }
-    .panel .meter > span { display: block; height: 100%; background: linear-gradient(90deg,var(--brand),#9be86b,#69d14f); width: 72%; }
-    section { padding: 56px 0; }
-    h2.section-title { font-size: clamp(22px, 3vw, 34px); margin: 0 0 10px; }
-    p.lead { color: var(--muted); margin-top: 6px; }
-    .grid { display: grid; gap: 18px; }
-    .grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
-    .grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
-    .card { background: var(--card); border: 1px solid var(--stroke); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
-    .card h3 { margin: 0 0 6px; font-size: 18px; }
-    .muted { color: var(--muted); font-size: 14px; }
-    .list { margin: 10px 0 0 0; padding: 0; list-style: none; }
-    .list li { margin: 8px 0; padding-left: 18px; position: relative; }
-    .list li:before { content: ""; width: 10px; height: 10px; border-radius: 2px; background: var(--brand); position: absolute; left: 0; top: 7px; box-shadow: 0 0 16px var(--brand); }
-    .pill { display: inline-flex; align-items: center; padding: 6px 10px; background: #0e1216; border: 1px solid var(--stroke); border-radius: 999px; gap: 8px; font-size: 12px; }
-    .row { display: flex; gap: 12px; flex-wrap: wrap; }
-    footer { border-top: 1px solid var(--stroke); padding: 24px 0 64px; color: var(--muted); font-size: 14px; }
-    @media (max-width: 960px) {
-      .hero-grid { grid-template-columns: 1fr; }
-      .grid.cols-3 { grid-template-columns: 1fr; }
-      .grid.cols-2 { grid-template-columns: 1fr; }
-    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,sans-serif}
+    a{color:var(--accent);text-decoration:none}
+    .app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
+    .sidebar{border-right:1px solid var(--stroke);background:linear-gradient(180deg,#0C0E12,#0A0B0D)}
+    .sb-head{display:flex;align-items:center;gap:10px;padding:18px 18px;border-bottom:1px solid var(--stroke)}
+    .logo{width:12px;height:12px;border-radius:3px;background:var(--accent);box-shadow:0 0 20px var(--accent)}
+    .brand{font-weight:800;letter-spacing:.2px}
+    .role{color:var(--muted);font-size:12px;margin-left:auto}
+    .sb-group{padding:14px 10px}
+    .sb-title{color:var(--muted);font-size:12px;font-weight:600;text-transform:uppercase;margin:8px 8px 6px}
+    .nav{list-style:none;padding:0;margin:0}
+    .nav li{margin:4px 0}
+    .nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:1px solid transparent;color:var(--text)}
+    .nav a.active{background:var(--panel);border-color:var(--stroke)}
+    .nav a:hover{background:#0E1116;border-color:var(--stroke)}
+
+    .main{display:flex;flex-direction:column}
+    .topbar{position:sticky;top:0;background:rgba(10,11,13,.8);backdrop-filter:saturate(160%) blur(8px);border-bottom:1px solid var(--stroke);z-index:10}
+    .tb-inner{display:flex;align-items:center;gap:12px;padding:12px 18px}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid var(--stroke);background:#0E1116;color:var(--muted);font-size:12px}
+    .search{flex:1;display:flex;align-items:center;gap:8px;background:#0E1116;border:1px solid var(--stroke);border-radius:12px;padding:8px 10px}
+    input[type="search"]{flex:1;background:transparent;border:0;color:var(--text);outline:none}
+    .user{display:flex;align-items:center;gap:10px}
+    .avatar{width:28px;height:28px;border-radius:50%;background:#222;display:grid;place-items:center;border:1px solid var(--stroke)}
+
+    .page{padding:18px}
+    .grid{display:grid;gap:16px}
+    .cols-4{grid-template-columns:repeat(4,1fr)}
+    .cols-3{grid-template-columns:repeat(3,1fr)}
+    .cols-2{grid-template-columns:repeat(2,1fr)}
+    @media (max-width:1200px){.cols-4{grid-template-columns:1fr 1fr}} 
+    @media (max-width:960px){.app{grid-template-columns:1fr}.sidebar{position:fixed;inset:56px auto 0 0;width:76%;max-width:320px;transform:translateX(-100%);transition:.25s}.sidebar.open{transform:none}.menu-btn{display:inline-flex} }
+    @media (min-width:961px){.menu-btn{display:none}}
+
+    .card{background:linear-gradient(180deg,#13151A,#0F1116);border:1px solid var(--stroke);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+    .card h3{margin:0 0 6px}
+    .muted{color:var(--muted)}
+    .kpi{display:flex;align-items:center;justify-content:space-between}
+    .kpi .val{font-size:28px;font-weight:800}
+    .bar{background:#0E1014;border:1px solid var(--stroke);height:10px;border-radius:999px;overflow:hidden}
+    .bar > span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#ff6a5a);width:60%}
+
+    .tabs{display:flex;gap:8px;margin:4px 0 8px}
+    .tab{padding:8px 12px;border-radius:10px;border:1px solid var(--stroke);background:#0E1116;color:var(--muted);cursor:pointer}
+    .tab.active{background:var(--panel);color:var(--text)}
+
+    .table{width:100%;border-collapse:collapse;font-size:13px}
+    .table th,.table td{padding:10px;border-bottom:1px solid var(--stroke);text-align:left}
+    .status{padding:4px 8px;border-radius:999px;font-size:12px;border:1px solid var(--stroke)}
+    .status.ok{background:rgba(98,210,111,.12);color:#98f0a1;border-color:rgba(98,210,111,.35)}
+    .status.warn{background:rgba(245,165,36,.12);color:#ffd18a;border-color:rgba(245,165,36,.35)}
+    .status.bad{background:rgba(255,92,92,.12);color:#ffb3b3;border-color:rgba(255,92,92,.35)}
+
+    .bay{display:flex;align-items:center;gap:10px;padding:10px;border:1px dashed var(--stroke);border-radius:12px}
+    .bay .dot{width:10px;height:10px;border-radius:50%}
+    .dot.free{background:var(--ok)}
+    .dot.busy{background:var(--accent)}
+    .dot.wait{background:var(--warn)}
+
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;border:1px solid var(--stroke);background:#0E1116;color:var(--text);cursor:pointer}
+    .btn.primary{background:linear-gradient(180deg,var(--accent),#c12e26);border-color:#f2756d;color:var(--accent-2);font-weight:800}
+    .btn.ghost{background:transparent}
+
+    .split{display:grid;grid-template-columns: 1.2fr .8fr;gap:16px}
+    @media (max-width:1100px){.split{grid-template-columns:1fr}}
+
+    .notice{padding:10px;border:1px solid var(--stroke);border-radius:12px;background:#0E1116;color:var(--muted)}
   </style>
 </head>
 <body>
-  <header class="nav">
-    <div class="container nav-inner">
-      <div class="brand"><span class="brand-dot"></span> PPR HQ Pro</div>
-      <nav class="nav-links">
-        <a href="#who">Who We Are</a>
-        <a href="#problem">Problem</a>
-        <a href="#solution">Solution</a>
-        <a href="#features">Features</a>
-        <a href="#pricing">Pricing</a>
-        <a href="#cta" class="pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12h14M13 5l7 7-7 7" stroke="#C1FF72" stroke-width="2" stroke-linecap="round"/></svg> Get Started</a>
-      </nav>
-    </div>
-  </header>
-
-  <section class="hero">
-    <div class="glow"></div>
-    <div class="container hero-grid">
-      <div>
-        <div class="eyebrow">OperatorHQ AI</div>
-        <h1>PPR Motorsports HQ Pro<br><span style="color:var(--brand)">The complete operating system</span> for performance shops</h1>
-        <p class="sub">Ditch generic tools. Run funnels, CRM, scheduling, reviews, content, memberships, events and reporting — all in one Operator built for dynos, builds, and car culture.</p>
-        <div class="row" style="margin-top:16px;">
-          <a href="#pricing" class="btn primary">See Pricing</a>
-          <a href="#solution" class="btn ghost">How it works</a>
-        </div>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="sb-head">
+        <div class="logo"></div>
+        <div class="brand">PPR HQ Pro</div>
+        <div class="role" id="roleLabel">Role: Owner</div>
       </div>
-      <div class="panel">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-          <strong>This Week’s Pipeline</strong>
-          <span class="pill"><span style="width:8px;height:8px;border-radius:50%;background:var(--brand);display:inline-block;"></span> Live</span>
-        </div>
-        <div class="row" style="margin-bottom:12px;">
-          <div class="card" style="flex:1;min-width:160px;">
-            <div class="muted">Booked Jobs</div>
-            <div style="font-size:28px;font-weight:800;">23</div>
-          </div>
-          <div class="card" style="flex:1;min-width:160px;">
-            <div class="muted">New Reviews</div>
-            <div style="font-size:28px;font-weight:800;">12</div>
-          </div>
-        </div>
-        <div class="muted" style="margin:6px 0 6px">Bay Utilization</div>
-        <div class="meter" aria-label="Bay Utilization"><span style="width:76%"></span></div>
-        <ul class="list" style="margin-top:12px">
-          <li>AI receptionist qualified 51 leads (BMW/Porsche bias)</li>
-          <li>Review engine on pace for +50/mo</li>
-          <li>Dyno Day RSVPs: 38 / 50 spots</li>
+
+      <div class="sb-group">
+        <div class="sb-title">Overview</div>
+        <ul class="nav">
+          <li><a href="#" class="active" data-page="dashboard">Dashboard</a></li>
+          <li><a href="#" data-page="calendar">Calendar & Bays</a></li>
+          <li><a href="#" data-page="inbox">Unified Inbox</a></li>
+          <li><a href="#" data-page="leads">Leads & CRM</a></li>
+          <li><a href="#" data-page="quotes">Quotes & Deposits</a></li>
         </ul>
       </div>
-    </div>
-  </section>
 
-  <section id="who">
-    <div class="container">
-      <h2 class="section-title">Who we are</h2>
-      <p class="lead">AdSpend Agency engineers growth systems. OperatorHQ AI delivers <strong>HQs</strong> — vertical-specific Business Operating Systems. <strong>HQ Pro</strong> is the ultimate tier: an Operator that runs your shop end-to-end.</p>
-      <div class="grid cols-3" style="margin-top:18px;">
-        <div class="card"><h3>AdSpend Agency</h3><p class="muted">Performance advertising + revenue engineering.</p></div>
-        <div class="card"><h3>OperatorHQ AI</h3><p class="muted">AI-powered Operators (local + cloud) that automate operations.</p></div>
-        <div class="card"><h3>HQs</h3><p class="muted">Prebuilt operating systems for specific industries — Roofers, Auto, etc.</p></div>
+      <div class="sb-group">
+        <div class="sb-title">Operations</div>
+        <ul class="nav">
+          <li><a href="#" data-page="workorders">Work Orders & QA</a></li>
+          <li><a href="#" data-page="parts">Parts & Fitment</a></li>
+          <li><a href="#" data-page="tuning">Tuner Brain</a></li>
+          <li><a href="#" data-page="memberships">Memberships</a></li>
+          <li><a href="#" data-page="events">Events (Dyno Day)</a></li>
+        </ul>
       </div>
-    </div>
-  </section>
 
-  <section id="problem">
-    <div class="container">
-      <h2 class="section-title">The problem</h2>
-      <div class="grid cols-3">
-        <div class="card"><h3>Missed revenue</h3><p class="muted">Missed calls, no-shows, slow follow-up, empty bays.</p></div>
-        <div class="card"><h3>Generic tools</h3><p class="muted">GHL & friends aren’t built for dynos, fitment, or tuning ops.</p></div>
-        <div class="card"><h3>Chaos</h3><p class="muted">Manual parts/status/content work. Customers kept in the dark.</p></div>
+      <div class="sb-group">
+        <div class="sb-title">Growth</div>
+        <ul class="nav">
+          <li><a href="#" data-page="content">Content Engine</a></li>
+          <li><a href="#" data-page="reviews">Reviews & GBP</a></li>
+          <li><a href="#" data-page="ads">Ads & Funnels</a></li>
+          <li><a href="#" data-page="reports">Reporting</a></li>
+        </ul>
       </div>
-    </div>
-  </section>
 
-  <section id="solution">
-    <div class="container">
-      <h2 class="section-title">The solution — HQ Pro</h2>
-      <p class="lead">A purpose-built Operator for performance shops: funnels → CRM → scheduler → reviews → content → memberships → events → reporting.</p>
-      <div class="grid cols-3" style="margin-top:18px;">
-        <div class="card">
-          <h3>Performance Funnels</h3>
-          <p class="muted">Stage 1/2/3, dyno RSVPs, turbo/exhaust packages with deposit-gated booking.</p>
-          <ul class="list"><li>HP goal quiz + VIN decode</li><li>Good/Better/Best quotes</li><li>Stripe deposits</li></ul>
-        </div>
-        <div class="card">
-          <h3>AI Receptionist</h3>
-          <p class="muted">Qualifies by car + HP goal across calls, SMS, webchat, IG/FB DMs.</p>
-          <ul class="list"><li>Unified inbox</li><li>Smart follow-ups</li><li>Lead routing</li></ul>
-        </div>
-        <div class="card">
-          <h3>Scheduler & Bays</h3>
-          <p class="muted">Bay/dyno load balancing, waitlist auto-fill, no-show deterrents.</p>
-          <ul class="list"><li>Confirm/reschedule links</li><li>Quick Lane mode</li><li>ETA-aware calendar</li></ul>
-        </div>
-        <div class="card">
-          <h3>Parts & Fitment</h3>
-          <p class="muted">PO automation, lead-time ETAs, core/returns, shelf/bin QR mapping.</p>
-          <ul class="list"><li>Fitment intelligence</li><li>CARB/EPA flags</li><li>Alternate suggestions</li></ul>
-        </div>
-        <div class="card">
-          <h3>RO / QA / Dyno Safety</h3>
-          <p class="muted">Digital ROs with torque/spec checklists and pre-run dyno gates.</p>
-          <ul class="list"><li>Road test & sign-off</li><li>Media consent</li><li>Compliance guard</li></ul>
-        </div>
-        <div class="card">
-          <h3>Tuner Brain</h3>
-          <p class="muted">ECU/TCU file vault (versioned), log viewer, remote tuner hub.</p>
-          <ul class="list"><li>Diffs & rollback</li><li>Anomaly highlights</li><li>Incident packets</li></ul>
-        </div>
-        <div class="card">
-          <h3>Content Engine</h3>
-          <p class="muted">Auto-edit reels from dyno runs, schedule to IG/TikTok/YouTube.</p>
-          <ul class="list"><li>HP overlay</li><li>Audio emphasis</li><li>Geo captions</li></ul>
-        </div>
-        <div class="card">
-          <h3>Reviews & Maps</h3>
-          <p class="muted">Event-triggered review asks + GBP posts to dominate local search.</p>
-          <ul class="list"><li>Negative intercept</li><li>Competitor watch</li><li>Velocity goals</li></ul>
-        </div>
-        <div class="card">
-          <h3>Memberships & Events</h3>
-          <p class="muted">PPR Club subscriptions + Dyno Day funnels with RSVP and payment.</p>
-          <ul class="list"><li>Seasonal reminders</li><li>Highlight reels</li><li>Referral engine</li></ul>
+      <div class="sb-group">
+        <div class="sb-title">Admin</div>
+        <ul class="nav">
+          <li><a href="#" data-page="settings">Settings & Roles</a></li>
+          <li><a href="#" data-page="slas">SLAs & Compliance</a></li>
+          <li><a href="#" data-page="migration">Migration from GHL</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="tb-inner">
+          <button class="btn ghost menu-btn" onclick="toggleSidebar()">☰</button>
+          <span class="pill">Environment: Pilot</span>
+          <div class="search"><span>🔎</span><input type="search" placeholder="Search leads, jobs, parts, posts..."/></div>
+          <div class="user"><div class="avatar">👤</div><select id="role" onchange="switchRole(this.value)"><option>Owner</option><option>Service Writer</option><option>Tech</option><option>Tuner</option><option>Front Desk</option></select></div>
         </div>
       </div>
-    </div>
-  </section>
 
-  <section>
-    <div class="container">
-      <h2 class="section-title">What this means for PPR</h2>
-      <div class="grid cols-2" style="margin-top:18px;">
-        <div class="card">
-          <h3>Outcomes</h3>
-          <ul class="list">
-            <li>Own your pipeline — no generic lead tools</li>
-            <li>Convert car culture into daily inbound</li>
-            <li>Dominate Chicago search with review velocity</li>
-            <li>Recurring revenue via memberships</li>
-            <li>Transparent CX: live job tracker & build sheets</li>
-          </ul>
+      <!-- PAGES -->
+      <section class="page" id="dashboard">
+        <div class="grid cols-4">
+          <div class="card kpi"><div><div class="muted">Booked Jobs (7d)</div><div class="val">27</div></div><div class="status ok">+12%</div></div>
+          <div class="card kpi"><div><div class="muted">New Reviews</div><div class="val">14</div></div><div class="status ok">4.9★</div></div>
+          <div class="card kpi"><div><div class="muted">Membership MRR</div><div class="val">$7,920</div></div><div class="status warn">+3.1%</div></div>
+          <div class="card kpi"><div><div class="muted">Bay Utilization</div><div class="val">76%</div></div></div>
         </div>
-        <div class="card">
-          <h3>Weekly Snapshot (example)</h3>
-          <ul class="list">
-            <li>Calls 148 → Booked Jobs 27 (18%)</li>
-            <li>Average Job Margin: 42%</li>
-            <li>New Reviews: 15 (4.9★ avg)</li>
-            <li>Content Reach: 62,400 views</li>
-            <li>MRR (Memberships): $7,920</li>
-          </ul>
+        <div class="split" style="margin-top:16px;">
+          <div class="card">
+            <h3>Live Bays</h3>
+            <div class="grid cols-2">
+              <div class="bay"><span class="dot busy"></span><strong>Bay 1</strong> · 2018 BMW M3 (Stage 2 tune) · ETA 2h</div>
+              <div class="bay"><span class="dot busy"></span><strong>Bay 2</strong> · 2016 Audi S4 (Downpipes) · ETA 3h</div>
+              <div class="bay"><span class="dot wait"></span><strong>Dyno</strong> · Porsche 911 (baseline) · in 20m</div>
+              <div class="bay"><span class="dot free"></span><strong>Quick Lane</strong> · Open slot (45m)</div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Today’s Schedule</h3>
+            <table class="table">
+              <thead><tr><th>Time</th><th>Customer</th><th>Vehicle</th><th>Service</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>9:00</td><td>R. Patel</td><td>BMW M3</td><td>Stage 2</td><td><span class="status ok">Checked-in</span></td></tr>
+                <tr><td>11:30</td><td>M. Lopez</td><td>Audi S4</td><td>Downpipes</td><td><span class="status warn">Parts ETA 40m</span></td></tr>
+                <tr><td>2:00</td><td>K. Nguyen</td><td>Porsche 911</td><td>Dyno baseline</td><td><span class="status">Queued</span></td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
-    </div>
-  </section>
+        <div class="grid cols-3" style="margin-top:16px;">
+          <div class="card"><h3>Alerts</h3><ul class="list"><li>Backorder: RS7 intercooler (offer Wagner alt)</li><li>Review CSAT 3★ (call-back task created)</li><li>No-show risk: 2pm hasn’t confirmed deposit</li></ul></div>
+          <div class="card"><h3>Content Queue</h3><ul class="list"><li>Reel: M3 dyno 487→536hp (scheduled 5pm)</li><li>Post: Before/After exhaust clip (Fri)</li><li>GBP: "Why baseline before tune" (auto)</li></ul></div>
+          <div class="card"><h3>Quick Actions</h3><div class="grid cols-2"><button class="btn primary">New Quote</button><button class="btn">Create Work Order</button><button class="btn">Order Parts</button><button class="btn">Review Campaign</button></div></div>
+        </div>
+      </section>
 
-  <section id="pricing">
-    <div class="container">
-      <h2 class="section-title">Investment</h2>
-      <p class="lead">Activation refund if not live in 14 days.</p>
-      <div class="grid cols-3" style="margin-top:18px;">
-        <div class="card">
-          <h3>HQ Pro Setup</h3>
-          <p class="muted">One-time implementation</p>
-          <ul class="list">
-            <li>$15,000</li>
-            <li>All core modules</li>
-            <li>Team onboarding</li>
-          </ul>
+      <section class="page" id="calendar" hidden>
+        <div class="tabs"><span class="tab active" data-tab="day">Day</span><span class="tab" data-tab="week">Week</span><span class="tab" data-tab="bays">Bays</span></div>
+        <div class="card"><div class="notice">ETA-aware calendar with deposit gating, auto-waitlist, and bay load balancing.</div></div>
+        <div class="grid cols-2" style="margin-top:12px;">
+          <div class="card"><h3>Bay Board</h3><div class="grid cols-2"><div class="bay"><span class="dot busy"></span>Bay 1 · Audi S4 (2h)</div><div class="bay"><span class="dot busy"></span>Bay 2 · BMW M3 (3h)</div><div class="bay"><span class="dot wait"></span>Dyno · Porsche 911 (baseline)</div><div class="bay"><span class="dot free"></span>Quick Lane · Open</div></div></div>
+          <div class="card"><h3>Confirmations</h3><table class="table"><thead><tr><th>Appt</th><th>Customer</th><th>Deposit</th><th>Confirm</th></tr></thead><tbody><tr><td>2:00</td><td>K. Nguyen</td><td>Paid</td><td><span class="status ok">Yes</span></td></tr><tr><td>3:30</td><td>J. Rivera</td><td>Unpaid</td><td><span class="status bad">No</span></td></tr></tbody></table></div>
         </div>
-        <div class="card">
-          <h3>Managed</h3>
-          <p class="muted">Ongoing ops & growth</p>
-          <ul class="list">
-            <li>$4,000–$6,000 / month</li>
-            <li>Content, reviews, calendar fill</li>
-            <li>Analytics & improvements</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3>Performance Kicker</h3>
-          <p class="muted">Optional success fee</p>
-          <ul class="list">
-            <li>$250 / tracked job</li>
-            <li>or 2–3% of high-ticket builds</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
+      </section>
 
-  <section id="cta">
-    <div class="container" style="text-align:center;">
-      <h2 class="section-title">Let’s launch PPR HQ Pro</h2>
-      <p class="lead">One closed job pays for the system.</p>
-      <div class="row" style="justify-content:center; margin-top:8px;">
-        <a href="#" class="btn primary">Book Strategy Session</a>
-        <a href="#" class="btn ghost">View Sample Build Sheet</a>
-      </div>
-      <p class="muted" style="margin-top:12px">© AdSpend Agency · OperatorHQ AI</p>
-    </div>
-  </section>
+      <section class="page" id="inbox" hidden>
+        <div class="card"><h3>Unified Inbox</h3><p class="muted">SMS · Calls · Webchat · IG/FB DMs consolidated with AI suggested replies.</p></div>
+        <div class="grid cols-2" style="margin-top:12px;">
+          <div class="card"><strong>Thread: @m3_comp</strong><p class="muted">"What gains for Stage 1?"</p><button class="btn primary">Insert HP gains + quote</button></div>
+          <div class="card"><strong>Thread: Webchat</strong><p class="muted">"Do you finance turbo installs?"</p><button class="btn">Send finance link</button></div>
+        </div>
+      </section>
 
-  <footer>
-    <div class="container">This is a concept preview. Features shown are representative of the HQ Pro system tailored for performance shops like PPR Motorsports.</div>
-  </footer>
+      <section class="page" id="leads" hidden>
+        <div class="tabs"><span class="tab active" data-tab="pipeline">Pipeline</span><span class="tab" data-tab="segments">Segments</span></div>
+        <div class="grid cols-2">
+          <div class="card">
+            <h3>Pipeline</h3>
+            <table class="table"><thead><tr><th>Lead</th><th>Vehicle</th><th>Interest</th><th>Stage</th><th>Status</th></tr></thead><tbody>
+              <tr><td>R. Patel</td><td>BMW M3</td><td>Stage 2</td><td>Booked</td><td><span class="status ok">Deposit</span></td></tr>
+              <tr><td>A. Gomez</td><td>Audi RS3</td><td>Downpipe</td><td>Quoted</td><td><span class="status warn">Follow-up</span></td></tr>
+              <tr><td>L. Chen</td><td>Porsche 911</td><td>Dyno</td><td>New</td><td><span class="status">Qualify</span></td></tr>
+            </tbody></table>
+          </div>
+          <div class="card">
+            <h3>Segments</h3>
+            <ul class="list"><li>BMW M cars · 84 leads</li><li>Porsche 911 · 33 leads</li><li>Turbo installs (finance) · 19 leads</li></ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="quotes" hidden>
+        <div class="grid cols-2">
+          <div class="card"><h3>Quote Builder</h3><div class="notice">VIN decode + fitment checks + Good/Better/Best pricing with margin guardrails.</div><table class="table" style="margin-top:8px"><thead><tr><th>Item</th><th>Qty</th><th>Cost</th><th>Price</th></tr></thead><tbody><tr><td>Downpipes</td><td>1</td><td>$780</td><td>$1,190</td></tr><tr><td>Labor (3h)</td><td>1</td><td>$0</td><td>$420</td></tr></tbody></table><button class="btn primary" style="margin-top:8px">Send with Deposit Link</button></div>
+          <div class="card"><h3>Deposits</h3><table class="table"><thead><tr><th>Customer</th><th>Amount</th><th>Status</th></tr></thead><tbody><tr><td>J. Rivera</td><td>$250</td><td><span class="status bad">Pending</span></td></tr><tr><td>K. Nguyen</td><td>$150</td><td><span class="status ok">Paid</span></td></tr></tbody></table></div>
+        </div>
+      </section>
+
+      <section class="page" id="workorders" hidden>
+        <div class="grid cols-3">
+          <div class="card"><h3>Digital RO</h3><ul class="list"><li>Intake photos (8 angles) ✅</li><li>Torque spec checklist ⏳</li><li>Fluids check ✅</li><li>Media consent ✅</li></ul></div>
+          <div class="card"><h3>Dyno Safety</h3><ul class="list"><li>Strap points verified ✅</li><li>Coolant temp OK ✅</li><li>Fan config set ✅</li><li>Abort rule armed ✅</li></ul></div>
+          <div class="card"><h3>Road Test & Sign-off</h3><ul class="list"><li>Route logged ✅</li><li>Max RPM safe ✅</li><li>Customer signature ⏳</li></ul></div>
+        </div>
+      </section>
+
+      <section class="page" id="parts" hidden>
+        <div class="split">
+          <div class="card"><h3>POs & ETAs</h3><table class="table"><thead><tr><th>PO</th><th>Vendor</th><th>Item</th><th>ETA</th><th>Status</th></tr></thead><tbody><tr><td>PO-1128</td><td>ECS</td><td>RS7 IC</td><td>Fri</td><td><span class="status warn">Backorder</span></td></tr><tr><td>PO-1130</td><td>FCP</td><td>Coilovers</td><td>Thu</td><td><span class="status ok">Shipped</span></td></tr></tbody></table></div>
+          <div class="card"><h3>Fitment Watch</h3><ul class="list"><li>Audi S4 downpipe → ✅</li><li>BMW M3 midpipe → ✅</li><li>Porsche 911 tips → ⚠ require adapter</li></ul></div>
+        </div>
+      </section>
+
+      <section class="page" id="tuning" hidden>
+        <div class="grid cols-2">
+          <div class="card"><h3>ECU/TCU Map Vault</h3><table class="table"><thead><tr><th>Vehicle</th><th>Map</th><th>Rev</th><th>Notes</th></tr></thead><tbody><tr><td>BMW M3</td><td>Stage 2</td><td>r4</td><td>+2° ign, 93oct</td></tr><tr><td>Audi RS3</td><td>Stage 1</td><td>r2</td><td>MAF scaled</td></tr></tbody></table></div>
+          <div class="card"><h3>Log Viewer</h3><div class="notice">Overlay boost / AFR / knock. Anomalies highlighted. Export to tuner.</div></div>
+        </div>
+      </section>
+
+      <section class="page" id="memberships" hidden>
+        <div class="grid cols-2">
+          <div class="card"><h3>PPR Club</h3><ul class="list"><li>Active members: 132</li><li>Churn (30d): 2.1%</li><li>Next campaign: Spring Dyno Health Checks</li></ul><button class="btn">Create Offer</button></div>
+          <div class="card"><h3>Billing</h3><table class="table"><thead><tr><th>Member</th><th>Plan</th><th>Status</th></tr></thead><tbody><tr><td>T. Allen</td><td>$99/mo</td><td><span class="status ok">Paid</span></td></tr><tr><td>S. Rahman</td><td>$149/mo</td><td><span class="status warn">Retrying</span></td></tr></tbody></table></div>
+        </div>
+      </section>
+
+      <section class="page" id="events" hidden>
+        <div class="grid cols-2">
+          <div class="card"><h3>Dyno Day</h3><ul class="list"><li>RSVPs: 38 / 50</li><li>Run order published</li><li>Highlight reel auto after event</li></ul><button class="btn primary">View Funnel</button></div>
+          <div class="card"><h3>Follow-up</h3><ul class="list"><li>Thanks email scheduled</li><li>Review ask queued</li><li>Upsell: Stage 1 for baselines</li></ul></div>
+        </div>
+      </section>
+
+      <section class="page" id="content" hidden>
+        <div class="grid cols-3">
+          <div class="card"><h3>Auto-Editor Queue</h3><ul class="list"><li>M3 dyno pull (audio emphasis)</li><li>S4 exhaust before/after</li><li>911 baseline graph overlay</li></ul></div>
+          <div class="card"><h3>Schedule</h3><ul class="list"><li>IG Reels · Today 5:00p</li><li>TikTok · Thu 12:00p</li><li>YouTube Short · Sat 10:00a</li></ul></div>
+          <div class="card"><h3>Captions</h3><ul class="list"><li>“487→536hp on 93 #M3 #Chicago”</li><li>“S4 wakes up with downpipes”</li><li>“Why baseline first”</li></ul></div>
+        </div>
+      </section>
+
+      <section class="page" id="reviews" hidden>
+        <div class="grid cols-2">
+          <div class="card"><h3>Review Velocity</h3><div class="bar" style="margin:8px 0 12px"><span style="width:68%"></span></div><p class="muted">Goal: 20 new reviews / month. Current: 14.</p></div>
+          <div class="card"><h3>Competitor Watch</h3><ul class="list"><li>Shop A: +9/mo, 4.7★</li><li>Shop B: +5/mo, 4.8★</li><li>PPR: +14/mo, 4.9★</li></ul></div>
+        </div>
+      </section>
+
+      <section class="page" id="ads" hidden>
+        <div class="grid cols-2">
+          <div class="card"><h3>Funnels</h3><ul class="list"><li>Stage 1/2/3 — BMW</li><li>Dyno Baseline</li><li>Turbo Install (Finance)</li></ul><button class="btn">Generate Ads</button></div>
+          <div class="card"><h3>Budget & CPL</h3><ul class="list"><li>Spend (7d): $1,240</li><li>CPL: $82</li><li>Booked Rate: 19%</li></ul></div>
+        </div>
+      </section>
+
+      <section class="page" id="reports" hidden>
+        <div class="grid cols-3">
+          <div class="card"><h3>Weekly Snapshot</h3><ul class="list"><li>Calls: 148</li><li>Leads: 62</li><li>Booked: 27</li><li>Jobs Margin: 42%</li></ul></div>
+          <div class="card"><h3>Anomalies</h3><ul class="list"><li>No-show spike Tue 3–5p</li><li>Tuner backlog 2 jobs</li><li>Backorder IC impacts 3 quotes</li></ul></div>
+          <div class="card"><h3>Recommendations</h3><ul class="list"><li>Shift 20% budget to BMW</li><li>Offer alt intercooler kit</li><li>Open Quick Lane at 4pm</li></ul></div>
+        </div>
+      </section>
+
+      <section class="page" id="settings" hidden>
+        <div class="grid cols-2">
+          <div class="card"><h3>Roles & Permissions</h3><ul class="list"><li>Owner: full access</li><li>Service Writer: quotes, RO, calendar</li><li>Tech: RO tasks only</li><li>Tuner: maps & logs</li><li>Front Desk: inbox & schedule</li></ul></div>
+          <div class="card"><h3>Brand</h3><p class="muted">Update colors to exact PPR palette if different:</p><pre style="white-space:pre-wrap;background:#0E1116;border:1px solid var(--stroke);padding:12px;border-radius:10px">:root{ --accent: #E1352B; /* PPR red? */ --bg:#0A0B0D; --panel:#13151A; }</pre></div>
+        </div>
+      </section>
+
+      <section class="page" id="slas" hidden>
+        <div class="card"><h3>SLAs & Compliance</h3><ul class="list"><li>Lead response &lt; 5 minutes</li><li>TCPA consent logging ON</li><li>CARB/EPA disclaimers in quotes</li><li>Call recording notice visible</li></ul></div>
+      </section>
+
+      <section class="page" id="migration" hidden>
+        <div class="card"><h3>Migration from GHL</h3><ol class="list" style="list-style:decimal inside"><li>Export contacts, pipelines, tags</li><li>Port numbers (Twilio/CallRail)</li><li>Parallel-run 14 days</li><li>Cutover after acceptance checklist</li></ol></div>
+      </section>
+
+    </main>
+  </div>
 
   <script>
-    // Smooth scroll for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(a => {
-      a.addEventListener('click', (e) => {
-        const id = a.getAttribute('href');
-        if(id && id !== '#') {
-          e.preventDefault();
-          document.querySelector(id).scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }
-      })
-    })
+    // Sidebar toggle (mobile)
+    function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
+
+    // Simple SPA routing
+    const links = document.querySelectorAll('.nav a');
+    const pages = document.querySelectorAll('.page');
+    links.forEach(a=>a.addEventListener('click',e=>{e.preventDefault();links.forEach(l=>l.classList.remove('active'));a.classList.add('active');const id=a.dataset.page;pages.forEach(p=>p.hidden = p.id!==id);window.scrollTo({top:0,behavior:'smooth'});}));
+
+    // Tabs (per page)
+    document.querySelectorAll('.tabs .tab').forEach(t=>t.addEventListener('click',()=>{const group=t.parentElement.querySelectorAll('.tab');group.forEach(x=>x.classList.remove('active'));t.classList.add('active');}));
+
+    // Role switching (filters visible nav/pages subtly)
+    const roleToHide = {
+      'Owner': [],
+      'Service Writer': ['ads','reports'],
+      'Tech': ['leads','quotes','ads','reviews','content','reports','memberships','events'],
+      'Tuner': ['leads','quotes','ads','reviews','content','memberships','events'],
+      'Front Desk': ['tuning','workorders','parts']
+    };
+    function switchRole(role){
+      document.getElementById('roleLabel').textContent = 'Role: ' + role;
+      const hide = new Set(roleToHide[role]||[]);
+      // show all
+      links.forEach(a=>a.parentElement.style.display='');
+      // hide certain navs
+      links.forEach(a=>{ if(hide.has(a.dataset.page)) a.parentElement.style.display='none'; });
+      // ensure current page is visible
+      const current = document.querySelector('.nav a.active');
+      if (current && current.parentElement.style.display==='none'){
+        document.querySelector('.nav a[data-page="dashboard"]').click();
+      }
+    }
   </script>
 </body>
 </html>
